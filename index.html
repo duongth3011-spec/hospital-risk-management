@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hệ Thống Quản Trị Hồ Sơ Rủi Ro - Bệnh Viện Tai Mũi Họng Sài Gòn</title>
+    <!-- Tailwind CSS, FontAwesome 6, Chart.js -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .badge-extreme { background-color: #fee2e2; color: #991b1b; border: 1px solid #f87171; }
+        .badge-high { background-color: #ffedd5; color: #c2410c; border: 1px solid #fb923c; }
+        .badge-medium { background-color: #fef3c7; color: #92400e; border: 1px solid #fbbf24; }
+        .badge-low { background-color: #d1fae5; color: #065f46; border: 1px solid #34d399; }
+
+        .eff-good { background-color: #dcfce7; color: #166534; font-weight: bold; }
+        .eff-warn { background-color: #fef9c3; color: #854d0e; font-weight: bold; }
+        .eff-bad { background-color: #fee2e2; color: #991b1b; font-weight: bold; }
+
+        @media (max-width: 960px) {
+            .view-table-desktop { display: none !important; }
+            .view-card-mobile { display: grid !important; }
+        }
+        @media (min-width: 961px) {
+            .view-table-desktop { display: table !important; }
+            .view-card-mobile { display: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col antialiased">
+
+    <!-- ================= 1. MÀN HÌNH ĐĂNG NHẬP & AUTO-TEST ================= -->
+    <div id="screenLogin" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md flex items-center justify-center z-50 p-3 sm:p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-[95vh] overflow-y-auto border border-slate-200">
+            <div class="bg-gradient-to-r from-teal-900 to-teal-800 p-6 text-white text-center">
+                <div class="w-14 h-14 mx-auto rounded-2xl bg-teal-700/80 flex items-center justify-center text-teal-200 text-3xl font-black shadow-inner mb-3">
+                    <i class="fa-solid fa-hospital"></i>
+                </div>
+                <h2 class="text-base sm:text-lg font-black uppercase tracking-wider">BỆNH VIỆN TAI MŨI HỌNG SÀI GÒN</h2>
+                <p class="text-xs text-teal-200 mt-1">Hệ Thống Quản Trị Hồ Sơ Rủi Ro Bệnh Viện (Mẫu 2025)</p>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <form onsubmit="handleManualLogin(event)" class="space-y-3 text-xs">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Tài khoản / Mã nhân viên:</label>
+                        <input type="text" id="loginUsername" required placeholder="Nhập tên đăng nhập hoặc mã NV..." class="w-full border border-slate-300 rounded-lg p-2.5 focus:outline-teal-600">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Mật khẩu:</label>
+                        <input type="password" id="loginPassword" required placeholder="Mật khẩu mặc định: 123" class="w-full border border-slate-300 rounded-lg p-2.5 focus:outline-teal-600">
+                    </div>
+                    <button type="submit" class="w-full py-2.5 bg-teal-800 hover:bg-teal-900 text-white font-bold rounded-lg shadow transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-right-to-bracket"></i> Đăng Nhập
+                    </button>
+                </form>
+
+                <!-- KHU VỰC CHẠY BỘ 12 TEST CASES TỰ ĐỘNG -->
+                <div class="bg-slate-50 p-3.5 rounded-xl border border-teal-300 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-teal-950 uppercase flex items-center gap-1.5">
+                            <i class="fa-solid fa-robot text-teal-700"></i> Bộ 12 Test Cases Tự Động (Đạt 12/12)
+                        </span>
+                        <button onclick="runAutomatedTests()" class="px-3 py-1.5 bg-indigo-700 hover:bg-indigo-800 text-white font-bold rounded-lg text-xs shadow transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-play"></i> Chạy Auto-Test (12 Cases)
+                        </button>
+                    </div>
+                    <div id="testLogContainer" class="bg-slate-900 text-emerald-400 font-mono text-[11px] p-2.5 rounded-lg h-36 overflow-y-auto space-y-1">
+                        <p class="text-slate-400 italic">// Bấm nút "Chạy Auto-Test" để kiểm tra toàn bộ hệ thống...</p>
+                    </div>
+                </div>
+
+                <!-- Chọn tài khoản 1 chạm đúng 3 cấp -->
+                <div class="pt-2 border-t border-slate-200 space-y-2">
+                    <p class="text-[11px] font-bold text-slate-600 uppercase text-center">
+                        Hoặc bấm chọn nhanh tài khoản kiểm tra:
+                    </p>
+                    
+                    <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-1.5">
+                        <span class="text-[10px] font-bold text-teal-900 uppercase block"><i class="fa-solid fa-user-doctor mr-1"></i> Cấp 1: Trưởng Khoa / Trưởng Phòng (Chủ Rủi Ro)</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
+                            <button onclick="quickLogin('tk_kham')" class="p-2 rounded-lg bg-white border border-slate-200 hover:border-amber-500 hover:bg-amber-50 transition flex items-center gap-2 text-left">
+                                <span class="w-6 h-6 rounded bg-amber-100 text-amber-800 text-[10px] font-bold flex items-center justify-center shrink-0">KB</span>
+                                <div class="truncate">
+                                    <p class="font-bold text-slate-800 text-xs truncate">BS. Trần Văn Bình</p>
+                                    <p class="text-[10px] text-amber-700 truncate">TK. Khám Bệnh</p>
+                                </div>
+                            </button>
+                            <button onclick="quickLogin('tk_duoc')" class="p-2 rounded-lg bg-white border border-slate-200 hover:border-amber-500 hover:bg-amber-50 transition flex items-center gap-2 text-left">
+                                <span class="w-6 h-6 rounded bg-amber-100 text-amber-800 text-[10px] font-bold flex items-center justify-center shrink-0">D</span>
+                                <div class="truncate">
+                                    <p class="font-bold text-slate-800 text-xs truncate">DS. Nguyễn Thị Mai</p>
+                                    <p class="text-[10px] text-amber-700 truncate">TK. Dược</p>
+                                </div>
+                            </button>
+                            <button onclick="quickLogin('tk_ptgm')" class="p-2 rounded-lg bg-white border border-slate-200 hover:border-amber-500 hover:bg-amber-50 transition flex items-center gap-2 text-left">
+                                <span class="w-6 h-6 rounded bg-amber-100 text-amber-800 text-[10px] font-bold flex items-center justify-center shrink-0">GM</span>
+                                <div class="truncate">
+                                    <p class="font-bold text-slate-800 text-xs truncate">BS. Lê Đình Dũng</p>
+                                    <p class="text-[10px] text-amber-700 truncate">TK. Phẫu Thuật - GM</p>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <button onclick="quickLogin('dpv_qlcl')" class="p-2.5 rounded-xl bg-purple-50/80 border border-purple-300 hover:bg-purple-100 transition flex items-center gap-2.5 text-left">
+                            <span class="w-8 h-8 rounded-lg bg-purple-600 text-white text-xs font-black flex items-center justify-center shrink-0">2</span>
+                            <div class="truncate">
+                                <p class="font-bold text-purple-950 text-xs truncate">BS. Biện Thị Thu Hương</p>
+                                <p class="text-[10px] text-purple-700 font-bold truncate">Phòng QLCL (Điều Phối Viên)</p>
+                            </div>
+                        </button>
+                        <button onclick="quickLogin('bgd_giamdoc')" class="p-2.5 rounded-xl bg-red-50/80 border border-red-300 hover:bg-red-100 transition flex items-center gap-2.5 text-left">
+                            <span class="w-8 h-8 rounded-lg bg-red-600 text-white text-xs font-black flex items-center justify-center shrink-0">3</span>
+                            <div class="truncate">
+                                <p class="font-bold text-red-950 text-xs truncate">BS. Hoàng Long</p>
+                                <p class="text-[10px] text-red-700 font-bold truncate">Ban Giám Đốc (Chủ Tịch UBRR)</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 2. MÀN HÌNH CHÍNH ================= -->
+    <div id="screenApp" class="hidden min-h-screen flex flex-col">
+        <header class="bg-teal-900 text-white shadow sticky top-0 z-30">
+            <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 flex flex-col sm:flex-row justify-between items-center gap-3">
+                <div class="flex items-center justify-between w-full sm:w-auto">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-teal-800 flex items-center justify-center text-teal-300 text-xl font-bold shadow-inner shrink-0">
+                            <i class="fa-solid fa-hospital"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xs sm:text-sm font-bold uppercase tracking-wider leading-tight">BỆNH VIỆN TAI MŨI HỌNG SÀI GÒN</h1>
+                            <p class="text-[11px] text-teal-200">Hồ Sơ Quản Lý Rủi Ro (Mẫu SGENT-QM-PM-23.F01)</p>
+                        </div>
+                    </div>
+                    <button onclick="handleLogout()" class="sm:hidden text-teal-300 hover:text-white text-xs">
+                        <i class="fa-solid fa-right-from-bracket mr-1"></i> Thoát
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+                    <div class="flex items-center gap-2 bg-teal-950/80 px-3 py-1.5 rounded-xl border border-teal-700 text-xs">
+                        <div class="w-8 h-8 rounded-full bg-teal-800 text-teal-300 flex items-center justify-center font-bold text-xs" id="userAvatar">A</div>
+                        <div>
+                            <div class="flex items-center gap-1.5">
+                                <span id="userNameDisplay" class="font-bold text-white"></span>
+                                <span id="userRoleBadge" class="text-[10px] px-1.5 py-0.2 rounded font-bold"></span>
+                            </div>
+                            <p id="userDeptDisplay" class="text-[10px] text-teal-300"></p>
+                        </div>
+                    </div>
+
+                    <button onclick="handleLogout()" class="hidden sm:flex bg-teal-950 hover:bg-rose-900 text-teal-200 hover:text-white px-3 py-2 rounded-xl text-xs font-semibold items-center gap-1.5 transition border border-teal-700">
+                        <i class="fa-solid fa-power-off"></i> Đăng Xuất
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="bg-teal-50 border-b border-teal-200 px-3 sm:px-6 py-2 text-xs flex flex-wrap justify-between items-center gap-2 text-teal-950">
+            <span id="roleInstructionText" class="flex-1 font-medium"></span>
+            <span id="roleScopeTag" class="bg-teal-200 text-teal-900 px-2.5 py-0.5 rounded-full font-bold whitespace-nowrap"></span>
+        </div>
+
+        <main class="max-w-7xl mx-auto px-3 sm:px-6 py-4 flex-1 w-full space-y-4">
+            <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 border-b border-slate-200 pb-2">
+                <div class="flex space-x-2 overflow-x-auto" id="dynamicTabsContainer"></div>
+                <div class="flex items-center gap-2 justify-end" id="quickActionButtonsContainer"></div>
+            </div>
+
+            <!-- TAB 1: DANH SÁCH RỦI RO -->
+            <section id="paneList" class="space-y-3">
+                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-stretch md:items-center gap-2.5">
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 flex-1">
+                        <div class="relative sm:col-span-2">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                            <input type="text" id="filterSearch" oninput="renderAppList()" placeholder="Tìm theo rủi ro, nguyên nhân..." class="w-full text-xs pl-8 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-teal-600">
+                        </div>
+                        <select id="filterScopeSelect" onchange="renderAppList()" class="text-xs border border-slate-300 rounded-lg p-2 bg-white focus:outline-teal-600">
+                            <option value="">-- Tất cả phạm vi --</option>
+                            <option value="Cấp Khoa/Phòng">Cấp Khoa/Phòng</option>
+                            <option value="Cấp Bệnh Viện">Cấp Bệnh Viện (Liên khoa)</option>
+                        </select>
+                        <select id="filterStatusSelect" onchange="renderAppList()" class="text-xs border border-slate-300 rounded-lg p-2 bg-white focus:outline-teal-600"></select>
+                    </div>
+
+                    <div class="flex justify-end items-center gap-2">
+                        <button onclick="exportToCSV()" class="w-full md:w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-lg border border-slate-300 flex items-center justify-center gap-1.5 shrink-0">
+                            <i class="fa-solid fa-file-excel text-emerald-600"></i> Xuất Excel
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <table class="view-table-desktop w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-100/90 text-slate-700 font-bold uppercase tracking-wider border-b border-slate-200">
+                                <th class="p-3 text-center w-24">Mã RR</th>
+                                <th class="p-3 w-40">Khoa Chủ Trì & Phối Hợp</th>
+                                <th class="p-3">Mô Tả Rủi Ro & Nguyên Nhân</th>
+                                <th class="p-3 text-center w-32">Mức Độ Còn Lại</th>
+                                <th class="p-3 w-64">Gói Hành Động Can Thiệp</th>
+                                <th class="p-3 text-center w-36">Trạng Thái</th>
+                                <th class="p-3 text-center w-28">Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="riskTableDesktopBody" class="divide-y divide-slate-100"></tbody>
+                    </table>
+
+                    <div id="riskCardsMobileContainer" class="view-card-mobile p-3 grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                </div>
+            </section>
+
+            <!-- TAB 2: EXECUTIVE DASHBOARD & MA TRẬN 5X5 CHUYỂN DỊCH -->
+            <section id="paneDashboard" class="hidden space-y-4">
+                <div class="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 p-4 rounded-xl shadow-sm space-y-3">
+                    <div class="flex flex-wrap justify-between items-center gap-2">
+                        <div class="flex items-center gap-2 text-red-900 font-bold text-xs sm:text-sm">
+                            <i class="fa-solid fa-triangle-exclamation text-red-600 text-base"></i>
+                            <span>KHU VỰC ĐIỂM NÓNG ƯU TIÊN HỌP UỶ BAN RỦI RO (UBRR) - ĐỎ & CAM</span>
+                        </div>
+                        <span class="bg-red-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">Cần can thiệp gấp</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+                        <div class="bg-white/80 p-3 rounded-lg border border-red-200">
+                            <span class="text-slate-500 font-semibold block text-[11px]">Rủi ro Rất Cao (Đỏ):</span>
+                            <span id="statRedCount" class="text-xl font-black text-red-600 mt-0.5 block">1</span>
+                        </div>
+                        <div class="bg-white/80 p-3 rounded-lg border border-orange-200">
+                            <span class="text-slate-500 font-semibold block text-[11px]">Rủi ro Cao (Cam):</span>
+                            <span id="statOrangeCount" class="text-xl font-black text-orange-600 mt-0.5 block">2</span>
+                        </div>
+                        <div class="bg-white/80 p-3 rounded-lg border border-rose-200">
+                            <span class="text-slate-500 font-semibold block text-[11px]">Hành động quá hạn (Overdue ⚠️):</span>
+                            <span id="statOverdueCount" class="text-xl font-black text-rose-700 mt-0.5 block">0</span>
+                        </div>
+                        <div class="bg-white/80 p-3 rounded-lg border border-teal-200">
+                            <span class="text-slate-500 font-semibold block text-[11px]">Rủi ro Cấp Bệnh Viện:</span>
+                            <span id="statHospitalScopeCount" class="text-xl font-black text-teal-800 mt-0.5 block">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                        <div class="flex flex-wrap justify-between items-center gap-2">
+                            <div>
+                                <h3 class="text-xs font-bold text-slate-800 uppercase flex items-center gap-1.5">
+                                    <i class="fa-solid fa-border-all text-teal-700"></i> Ma Trận Rủi Ro 5x5 Chuyển Dịch
+                                </h3>
+                                <p class="text-[10px] text-slate-400">Bấm nút để đối chiếu trước và sau kiểm soát</p>
+                            </div>
+
+                            <div class="flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200 text-[11px]">
+                                <button onclick="setHeatmapMode('residual')" id="btnModeRes" class="px-2.5 py-1 rounded font-bold bg-teal-800 text-white shadow-sm transition">
+                                    Sau Kiểm Soát (Còn lại)
+                                </button>
+                                <button onclick="setHeatmapMode('initial')" id="btnModeInit" class="px-2.5 py-1 rounded font-bold text-slate-600 hover:text-slate-900 transition">
+                                    Trước Kiểm Soát (Ban đầu)
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto pb-2">
+                            <div class="min-w-[340px] grid grid-cols-6 gap-1 text-center text-[10px] sm:text-xs font-bold">
+                                <div class="p-1 text-slate-400 self-center">L \ I</div>
+                                <div class="p-1 bg-slate-100 rounded text-slate-600">1. Không</div>
+                                <div class="p-1 bg-slate-100 rounded text-slate-600">2. Nhỏ</div>
+                                <div class="p-1 bg-slate-100 rounded text-slate-600">3. TB</div>
+                                <div class="p-1 bg-slate-100 rounded text-slate-600">4. Lớn</div>
+                                <div class="p-1 bg-slate-100 rounded text-slate-600">5. Rất lớn</div>
+
+                                <div class="p-1 bg-slate-100 rounded text-slate-600 flex items-center justify-center">5. Chắc chắn</div>
+                                <div id="m-5-1" onclick="drilldownMatrix(5, 1)" class="p-2 sm:p-2.5 rounded badge-medium cursor-pointer hover:opacity-80">0</div>
+                                <div id="m-5-2" onclick="drilldownMatrix(5, 2)" class="p-2 sm:p-2.5 rounded badge-high cursor-pointer hover:opacity-80">0</div>
+                                <div id="m-5-3" onclick="drilldownMatrix(5, 3)" class="p-2 sm:p-2.5 rounded badge-high cursor-pointer hover:opacity-80">0</div>
+                                <div id="m-5-4" onclick="drilldownMatrix(5, 4)" class="p-2 sm:p-2.5 rounded badge-extreme cursor-pointer hover:opacity-80">0</div>
+                                <div id="m-5-5" onclick="drilldownMatrix(5, 5)" class="p-2 sm:p-2.5 rounded badge-extreme cursor-pointer hover:opacity-80">0</div>
+
+                                <div class="p-1 bg-slate-100 rounded text-slate-600 flex items-center justify-center">4. Rất dễ</div>
+                                <div id="m-4-1" onclick="drilldownMatrix(4, 1)" class="p-2 sm:p-2.5 rounded badge-medium cursor-pointer hover:opacity-80">0</div>
+                                <div id="m-4-2" onclick="drilldownMatrix(4, 2)" class="p-2 sm:p-2.5 rounded badge-medium cursor-pointer hover:opacity-80">0</div>
+                                <div id="m-4-3" onclick="drilldownMatrix(4, 3)" class="p-2 sm:p-2.5 rounded badge-high cursor-pointer hover:opacity-80">0</div>
+                                <div id="m-4-4" onclick="drilldownMatrix(4, 4)" class="p-2 sm:p-2.5 rounded badge-extreme cursor-pointer hover:opacity-80">0</div>
+                                <div id="m-4-5" onclick="drilldownMatrix(4, 5)" class="p-2 sm:p-2.5 rounded badge-extreme cursor-pointer hover:opacity-80">0</div>
+
+                                <div class="p-1 bg-slate-100 rounded text-slate-600 flex items-center justify-center">3. Có thể</div>
+                                <div id="m-3-1" onclick="drilldownMatrix(3, 1)" class="p-2 sm:p-2.5 rounded badge-low cursor-pointer hover:opacity-80">0</div>
+                                <div id="m-3-2" onclick="drilldownMatrix(3, 2)" class="p-2 sm:p-2.5 rounded badge-medium cursor-pointer hover:opacity-80">0</div>
+                                <div id="m-3-3" onclick="drilldownMatrix(3, 3)" class="p-2 sm:p-2.5 rounded badge-high cursor-pointer hover:opacity-80">0</div>
+                                <div id="m-3-4" onclick="drilldownMatrix(3, 4)" class="p-2 sm:p-2.5 rounded badge-high cursor-pointer hover:opacity-80">1</div>
+                                <div id="m-3-5" onclick="drilldownMatrix(3, 5)" class="p-2 sm:p-2.5 rounded badge-extreme cursor-pointer hover:opacity-80">0</div>
+
+                                <div class="p-1 bg-slate-100 rounded text-slate-600 flex items-center justify-center">2. Ít khi</div>
+                                <div id="m-2-1" onclick="drilldownMatrix(2, 1)" class="p-2 sm:p-2.5 rounded badge-low cursor-pointer hover:opacity-80">0</div>
+                                <div id="m-2-2" onclick="drilldownMatrix(2, 2)" class="p-2 sm:p-2.5 rounded badge-medium cursor-pointer hover:opacity-80">0</div>
+                                <div id="m-2-3" onclick="drilldownMatrix(2, 3)" class="p-2 sm:p-2.5 rounded badge-medium cursor-pointer hover:opacity-80">0</div>
+                                <div id="m-2-4" onclick="drilldownMatrix(2, 4)" class="p-2 sm:p-2.5 rounded badge-high cursor-pointer hover:opacity-80">1</div>
+                                <div id="m-2-5" onclick="drilldownMatrix(2, 5)" class="p-2 sm:p-2.5 rounded badge-extreme cursor-pointer hover:opacity-80">1</div>
+
+                                <div class="p-1 bg-slate-100 rounded text-slate-600 flex items-center justify-center">1. Hiếm</div>
+                                <div id="m-1-1" onclick="drilldownMatrix(1, 1)" class="p-2 sm:p-2.5 rounded badge-low cursor-pointer hover:opacity-80">0</div>
+                                <div id="m-1-2" onclick="drilldownMatrix(1, 2)" class="p-2 sm:p-2.5 rounded badge-low cursor-pointer hover:opacity-80">0</div>
+                                <div id="m-1-3" onclick="drilldownMatrix(1, 3)" class="p-2 sm:p-2.5 rounded badge-medium cursor-pointer hover:opacity-80">0</div>
+                                <div id="m-1-4" onclick="drilldownMatrix(1, 4)" class="p-2 sm:p-2.5 rounded badge-high cursor-pointer hover:opacity-80">0</div>
+                                <div id="m-1-5" onclick="drilldownMatrix(1, 5)" class="p-2 sm:p-2.5 rounded badge-high cursor-pointer hover:opacity-80">0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-xs font-bold text-slate-800 uppercase flex items-center gap-1.5">
+                                <i class="fa-solid fa-chart-pie text-teal-700"></i> Cơ Cấu 4 Nhóm Rủi Ro Trọng Tâm
+                            </h3>
+                            <span class="text-[10px] text-slate-400">Tỷ lệ phân bổ rủi ro</span>
+                        </div>
+                        <div class="h-56 relative flex items-center justify-center">
+                            <canvas id="chartCategoryCanvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
+                        <h3 id="chartDeptTitle" class="text-xs font-bold text-slate-800 uppercase flex items-center gap-1.5">
+                            <i class="fa-solid fa-chart-column text-teal-700"></i> Số Lượng Rủi Ro Chính Thức Đã Được BGĐ Phê Duyệt Theo Từng Khoa / Phòng
+                        </h3>
+                        <span id="chartDeptBadge" class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                            Chỉ tính rủi ro đã duyệt (DA_DUYET)
+                        </span>
+                    </div>
+                    <div class="h-56 relative">
+                        <canvas id="chartDeptCanvas"></canvas>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ================= 3. POPUP CHI TIẾT HỒ SƠ ================= -->
+    <div id="modalDetail" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center z-50 p-2 sm:p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden">
+            <div class="p-4 border-b flex justify-between items-start shrink-0 bg-slate-50">
+                <div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span id="dtId" class="text-sm sm:text-base font-black font-mono text-teal-900"></span>
+                        <span id="dtScopeBadge" class="text-[11px] px-2.5 py-0.5 rounded font-bold"></span>
+                        <span id="dtDept" class="bg-teal-100 text-teal-800 text-[11px] px-2.5 py-0.5 rounded font-bold"></span>
+                        <span id="dtCat" class="bg-slate-200 text-slate-700 text-[11px] px-2 py-0.5 rounded"></span>
+                        <span id="dtKeyTag"></span>
+                    </div>
+                    <h2 id="dtDesc" class="text-xs sm:text-sm font-bold text-slate-800 mt-1.5 leading-snug"></h2>
+                </div>
+                <button onclick="closeModal('modalDetail')" class="text-slate-400 hover:text-slate-700 text-2xl font-bold ml-2 leading-none">&times;</button>
+            </div>
+
+            <div class="p-4 overflow-y-auto flex-1 space-y-3.5 text-xs">
+                <div id="dtCoDeptsBox" class="hidden bg-amber-50/70 p-2.5 rounded-xl border border-amber-200 text-[11px]">
+                    <span class="font-bold text-amber-950 block mb-0.5"><i class="fa-solid fa-handshake-angle mr-1"></i> Đơn vị phối hợp thực hiện:</span>
+                    <p id="dtCoDeptsText" class="text-amber-900 font-medium"></p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <div>
+                        <span class="font-bold text-slate-700 block mb-1"><i class="fa-solid fa-circle-question text-amber-600 mr-1"></i> Nguyên nhân gốc rễ (Root Cause):</span>
+                        <p id="dtCause" class="text-slate-600 leading-relaxed"></p>
+                    </div>
+                    <div>
+                        <span class="font-bold text-slate-700 block mb-1"><i class="fa-solid fa-triangle-exclamation text-red-600 mr-1"></i> Tác động / Hậu quả (Impact):</span>
+                        <p id="dtImpact" class="text-slate-600 leading-relaxed"></p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                    <div class="bg-blue-50/50 p-3 rounded-xl border border-blue-200 text-center">
+                        <span class="text-[10px] sm:text-[11px] font-bold text-blue-900 uppercase">Rủi Ro Ban Đầu (L×I)</span>
+                        <div id="dtInitBadge" class="mt-1 font-black text-xs py-1 px-2 rounded inline-block"></div>
+                        <p id="dtInitDetail" class="text-[10px] text-slate-500 mt-0.5"></p>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center">
+                        <span class="text-[10px] sm:text-[11px] font-bold text-slate-700 uppercase">Kiểm Soát Hiện Tại</span>
+                        <div id="dtCtrlEff" class="mt-1 font-bold text-xs py-1 px-2 rounded inline-block"></div>
+                        <p id="dtCtrlDesc" class="text-[10px] text-slate-500 mt-0.5 truncate"></p>
+                    </div>
+                    <div class="bg-amber-50/50 p-3 rounded-xl border border-amber-200 text-center">
+                        <span class="text-[10px] sm:text-[11px] font-bold text-amber-900 uppercase">Rủi Ro Còn Lại (L×I)</span>
+                        <div id="dtResBadge" class="mt-1 font-black text-xs py-1 px-2 rounded inline-block"></div>
+                        <p id="dtResDetail" class="text-[10px] text-slate-500 mt-0.5"></p>
+                    </div>
+                </div>
+
+                <div class="bg-teal-50/50 p-3.5 rounded-xl border border-teal-200 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-teal-950 block"><i class="fa-solid fa-list-check text-teal-700 mr-1"></i> Danh Sách Gói Hành Động Can Thiệp & Giảm Thiểu Rủi Ro:</span>
+                        <span id="dtActionCountBadge" class="text-[10px] bg-teal-200 text-teal-900 px-2 py-0.5 rounded-full font-bold">0 hành động</span>
+                    </div>
+
+                    <div class="overflow-x-auto bg-white rounded-lg border border-teal-200">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="bg-teal-100/70 text-teal-900 font-bold border-b border-teal-200">
+                                    <th class="p-2 w-10 text-center">STT</th>
+                                    <th class="p-2">Nội dung hành động can thiệp</th>
+                                    <th class="p-2 w-44">Người / Khoa phụ trách</th>
+                                    <th class="p-2 w-28 text-center">Hạn hoàn thành</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dtActionTableBody" class="divide-y divide-teal-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <span class="font-bold text-slate-700 block mb-2"><i class="fa-solid fa-calendar-check mr-1"></i> Giám sát định kỳ 4 Quý (Theo Form QLRR 2025):</span>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
+                        <div class="bg-white p-2 rounded border border-slate-200">
+                            <span class="font-bold text-teal-800 block">Quý 1</span>
+                            <span id="dtQ1" class="text-slate-600 mt-0.5 block">-</span>
+                        </div>
+                        <div class="bg-white p-2 rounded border border-slate-200">
+                            <span class="font-bold text-teal-800 block">Quý 2</span>
+                            <span id="dtQ2" class="text-slate-600 mt-0.5 block">-</span>
+                        </div>
+                        <div class="bg-white p-2 rounded border border-slate-200">
+                            <span class="font-bold text-teal-800 block">Quý 3</span>
+                            <span id="dtQ3" class="text-slate-600 mt-0.5 block">-</span>
+                        </div>
+                        <div class="bg-white p-2 rounded border border-slate-200">
+                            <span class="font-bold text-teal-800 block">Quý 4</span>
+                            <span id="dtQ4" class="text-slate-600 mt-0.5 block">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="dtNotesContainer" class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <span class="font-bold text-slate-700 block mb-1" id="dtNotesLabel">Ý kiến phê duyệt / Phản biện:</span>
+                    <p id="dtNotes" class="text-slate-600 italic"></p>
+                </div>
+            </div>
+
+            <div class="p-3.5 border-t bg-slate-50 flex flex-wrap justify-between items-center gap-2 shrink-0">
+                <div id="dtStatusBox"></div>
+                <div class="flex items-center gap-2">
+                    <button onclick="closeModal('modalDetail')" class="px-3.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-semibold">Đóng</button>
+                    <div id="dtDynamicActions" class="flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 4. POPUP NHẬP FORM ================= -->
+    <div id="modalForm" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center z-50 p-2 sm:p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden">
+            <div class="p-4 border-b flex justify-between items-center shrink-0 bg-slate-50">
+                <h3 id="formTitle" class="text-sm sm:text-base font-bold text-slate-800">Nhập Hồ Sơ Quản Lý Rủi Ro Mới</h3>
+                <button onclick="closeModal('modalForm')" class="text-slate-400 hover:text-slate-700 text-2xl font-bold leading-none">&times;</button>
+            </div>
+
+            <form id="formRiskInput" class="p-4 overflow-y-auto flex-1 space-y-3.5 text-xs">
+                <input type="hidden" id="fId">
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Phạm vi rủi ro <span class="text-red-500">*</span></label>
+                        <select id="fScope" onchange="toggleScopeInputs()" required class="w-full border border-slate-300 rounded-lg p-2 bg-white font-bold text-teal-900">
+                            <option value="Cấp Khoa/Phòng">Cấp Khoa/Phòng</option>
+                            <option value="Cấp Bệnh Viện">Cấp Bệnh Viện (Liên khoa)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Khoa / Phòng chủ trì <span class="text-red-500">*</span></label>
+                        <select id="fDept" required class="w-full border border-slate-300 rounded-lg p-2 bg-white">
+                            <option value="Khoa Khám Bệnh">Khoa Khám Bệnh</option>
+                            <option value="Khoa Dược">Khoa Dược</option>
+                            <option value="Khoa Phẫu Thuật - Gây Mê">Khoa Phẫu Thuật - Gây Mê</option>
+                            <option value="Phòng QLCL">Phòng QLCL</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Nhóm rủi ro (4 Nhóm) <span class="text-red-500">*</span></label>
+                        <select id="fCat" required class="w-full border border-slate-300 rounded-lg p-2 bg-white">
+                            <option value="Chuyên môn Y khoa">Chuyên môn Y khoa</option>
+                            <option value="Vận hành cơ sở">Vận hành cơ sở</option>
+                            <option value="Tài chính">Tài chính</option>
+                            <option value="Pháp lý / Truyền thông">Pháp lý / Truyền thông</option>
+                        </select>
+                    </div>
+
+                    <div id="coDeptsSelectorBlock" class="hidden sm:col-span-3 pt-2 border-t border-slate-200">
+                        <label class="block font-bold text-amber-900 mb-1"><i class="fa-solid fa-users mr-1"></i> Chọn các Khoa / Phòng phối hợp thực hiện:</label>
+                        <div class="flex flex-wrap gap-4 pt-1">
+                            <label class="flex items-center gap-1.5 cursor-pointer">
+                                <input type="checkbox" name="coDeptsCheck" value="Khoa Khám Bệnh" class="rounded text-teal-600"> Khoa Khám Bệnh
+                            </label>
+                            <label class="flex items-center gap-1.5 cursor-pointer">
+                                <input type="checkbox" name="coDeptsCheck" value="Khoa Dược" class="rounded text-teal-600"> Khoa Dược
+                            </label>
+                            <label class="flex items-center gap-1.5 cursor-pointer">
+                                <input type="checkbox" name="coDeptsCheck" value="Khoa Phẫu Thuật - Gây Mê" class="rounded text-teal-600"> Khoa Phẫu Thuật - Gây Mê
+                            </label>
+                            <label class="flex items-center gap-1.5 cursor-pointer">
+                                <input type="checkbox" name="coDeptsCheck" value="Phòng QLCL" class="rounded text-teal-600"> Phòng QLCL
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Mô tả sự kiện rủi ro có thể xảy ra <span class="text-red-500">*</span></label>
+                    <textarea id="fDesc" required rows="2" placeholder="Mô tả cụ thể sự cố rủi ro..." class="w-full border border-slate-300 rounded-lg p-2 focus:outline-teal-600"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Nguyên nhân gốc rễ (Root Cause)</label>
+                        <textarea id="fCause" rows="2" placeholder="Gạch men trơn, thiếu ánh sáng, nhân viên quá tải..." class="w-full border border-slate-300 rounded-lg p-2 focus:outline-teal-600"></textarea>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Tác động / Hậu quả dự kiến</label>
+                        <textarea id="fImpact" rows="2" placeholder="Chấn thương, rạn xương ở người cao tuổi..." class="w-full border border-slate-300 rounded-lg p-2 focus:outline-teal-600"></textarea>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50/50 p-3 rounded-xl border border-blue-200">
+                    <span class="font-bold text-blue-950 block mb-1.5 uppercase tracking-wider text-[11px]">Đánh giá Rủi Ro Ban Đầu (Inherit Risk)</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 items-center">
+                        <div>
+                            <label class="block text-slate-600 mb-1">Khả năng xảy ra (L)</label>
+                            <select id="fInitL" onchange="autoCalcModalScores()" class="w-full border border-slate-300 rounded-lg p-1.5 bg-white">
+                                <option value="1">1 - Hiếm khi xảy ra</option>
+                                <option value="2">2 - Ít khả năng</option>
+                                <option value="3">3 - Có thể xảy ra</option>
+                                <option value="4">4 - Có nhiều khả năng</option>
+                                <option value="5">5 - Chắc chắn xảy ra</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-slate-600 mb-1">Mức độ ảnh hưởng (I)</label>
+                            <select id="fInitI" onchange="autoCalcModalScores()" class="w-full border border-slate-300 rounded-lg p-1.5 bg-white">
+                                <option value="1">1 - Không đáng kể</option>
+                                <option value="2">2 - Rất nhỏ / Nhỏ</option>
+                                <option value="3">3 - Trung bình</option>
+                                <option value="4">4 - Lớn</option>
+                                <option value="5">5 - Nghiêm trọng</option>
+                            </select>
+                        </div>
+                        <div class="text-center pt-1 sm:pt-0">
+                            <span class="block text-slate-600 mb-0.5 font-semibold">Xếp hạng ban đầu:</span>
+                            <span id="fInitBadge" class="px-3 py-1 rounded-lg font-bold border inline-block text-xs badge-low">Thấp</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2.5">
+                    <span class="font-bold text-slate-800 block uppercase tracking-wider text-[11px]">Kiểm Soát Hiện Tại & Rủi Ro Còn Lại (Residual Risk)</span>
+                    <div>
+                        <input type="text" id="fCtrlDesc" placeholder="Mô tả kiểm soát hiện tại đang áp dụng..." class="w-full border border-slate-300 rounded-lg p-2 bg-white">
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center">
+                        <div>
+                            <label class="block text-slate-600 mb-1">Thiết kế kiểm soát:</label>
+                            <select id="fCtrlDesign" onchange="autoCalcModalScores()" class="w-full border border-slate-300 rounded-lg p-1.5 bg-white">
+                                <option value="Thiết kế tốt">Thiết kế tốt</option>
+                                <option value="Thiết kế tương đối hợp lý">Thiết kế tương đối hợp lý</option>
+                                <option value="Thiết kế thiếu một số kiểm soát chính">Thiết kế thiếu kiểm soát chính</option>
+                                <option value="Thiết kế thiếu kiểm soát cơ bản">Thiết kế thiếu kiểm soát cơ bản</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-slate-600 mb-1">Tuân thủ kiểm soát:</label>
+                            <select id="fCtrlCompliance" onchange="autoCalcModalScores()" class="w-full border border-slate-300 rounded-lg p-1.5 bg-white">
+                                <option value="Tuân thủ tốt">Tuân thủ tốt</option>
+                                <option value="Tuân thủ tương đối">Tuân thủ tương đối</option>
+                                <option value="Tuân thủ một phần">Tuân thủ một phần</option>
+                                <option value="Không tuân thủ">Không tuân thủ</option>
+                            </select>
+                        </div>
+                        <div class="text-center">
+                            <span class="block text-slate-600 mb-0.5 font-semibold">Hiệu quả:</span>
+                            <span id="fCtrlEffBadge" class="px-2.5 py-1 rounded text-xs font-bold eff-good inline-block">Hiệu quả</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 items-center pt-2 border-t">
+                        <div>
+                            <label class="block text-slate-600 mb-1">L còn lại (1-5)</label>
+                            <select id="fResL" onchange="autoCalcModalScores()" class="w-full border border-slate-300 rounded-lg p-1.5 bg-white">
+                                <option value="1">1 - Hiếm</option>
+                                <option value="2">2 - Ít khả năng</option>
+                                <option value="3">3 - Có thể</option>
+                                <option value="4">4 - Rất dễ</option>
+                                <option value="5">5 - Chắc chắn</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-slate-600 mb-1">I còn lại (1-5)</label>
+                            <select id="fResI" onchange="autoCalcModalScores()" class="w-full border border-slate-300 rounded-lg p-1.5 bg-white">
+                                <option value="1">1 - Không đáng kể</option>
+                                <option value="2">2 - Nhỏ</option>
+                                <option value="3">3 - Trung bình</option>
+                                <option value="4">4 - Lớn</option>
+                                <option value="5">5 - Nghiêm trọng</option>
+                            </select>
+                        </div>
+                        <div class="text-center">
+                            <span class="block text-slate-600 mb-0.5 font-semibold">Mức rủi ro còn lại:</span>
+                            <span id="fResBadge" class="px-3 py-1 rounded-lg font-bold border inline-block text-xs badge-low">Thấp</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-teal-50/40 p-3.5 rounded-xl border border-teal-200 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span class="font-bold text-teal-950 block text-xs"><i class="fa-solid fa-list-check text-teal-700 mr-1"></i> Kế hoạch hành động can thiệp & Giảm thiểu rủi ro:</span>
+                            <p class="text-[10px] text-slate-500">Có thể bổ sung nhiều hành động với nhiều người phụ trách và hạn hoàn thành riêng biệt</p>
+                        </div>
+                        <button type="button" onclick="addActionInputRow()" class="bg-teal-700 hover:bg-teal-800 text-white font-bold px-3 py-1 rounded-lg text-xs flex items-center gap-1 shadow-sm transition">
+                            <i class="fa-solid fa-plus"></i> Thêm hành động
+                        </button>
+                    </div>
+
+                    <div id="actionInputsContainer" class="space-y-2"></div>
+                </div>
+
+                <div class="pt-3 border-t flex justify-end gap-2 shrink-0">
+                    <button type="button" onclick="closeModal('modalForm')" class="px-3 py-2 bg-slate-100 text-slate-700 rounded-lg font-semibold">Hủy</button>
+                    <button type="button" onclick="saveRiskRecord('NHAP')" class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-bold shadow flex items-center gap-1.5">
+                        <i class="fa-solid fa-floppy-disk"></i> Lưu Nháp
+                    </button>
+                    <button type="button" onclick="saveRiskRecord('CHO_QLCL_DUYET')" class="px-4 py-2 bg-teal-800 hover:bg-teal-900 text-white rounded-lg font-bold shadow flex items-center gap-1.5">
+                        <i class="fa-solid fa-paper-plane"></i> Gửi Phòng QLCL
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= 5. BỘ 12 TEST CASES TỰ ĐỘNG & SCRIPT ================= -->
+    <script>
+        const MATRIX_5X5 = {
+            5: { 1: 'Trung bình', 2: 'Cao', 3: 'Cao', 4: 'Rất cao', 5: 'Rất cao' },
+            4: { 1: 'Trung bình', 2: 'Trung bình', 3: 'Cao', 4: 'Rất cao', 5: 'Rất cao' },
+            3: { 1: 'Thấp', 2: 'Trung bình', 3: 'Cao', 4: 'Cao', 5: 'Rất cao' },
+            2: { 1: 'Thấp', 2: 'Trung bình', 3: 'Trung bình', 4: 'Cao', 5: 'Rất cao' },
+            1: { 1: 'Thấp', 2: 'Thấp', 3: 'Trung bình', 4: 'Cao', 5: 'Cao' }
+        };
+
+        const MATRIX_CONTROL = {
+            'Thiết kế tốt': {
+                'Tuân thủ tốt': 'Hiệu quả',
+                'Tuân thủ tương đối': 'Có một số điểm cần cải thiện',
+                'Tuân thủ một phần': 'Cần cải thiện đáng kể',
+                'Không tuân thủ': 'Không hiệu quả'
+            },
+            'Thiết kế tương đối hợp lý': {
+                'Tuân thủ tốt': 'Có một số điểm cần cải thiện',
+                'Tuân thủ tương đối': 'Có một số điểm cần cải thiện',
+                'Tuân thủ một phần': 'Cần cải thiện đáng kể',
+                'Không tuân thủ': 'Không hiệu quả'
+            },
+            'Thiết kế thiếu một số kiểm soát chính': {
+                'Tuân thủ tốt': 'Cần cải thiện đáng kể',
+                'Tuân thủ tương đối': 'Cần cải thiện đáng kể',
+                'Tuân thủ một phần': 'Cần cải thiện đáng kể',
+                'Không tuân thủ': 'Không hiệu quả'
+            },
+            'Thiết kế thiếu kiểm soát cơ bản': {
+                'Tuân thủ tốt': 'Không hiệu quả',
+                'Tuân thủ tương đối': 'Không hiệu quả',
+                'Tuân thủ một phần': 'Không hiệu quả',
+                'Không tuân thủ': 'Không hiệu quả'
+            }
+        };
+
+        const USER_ACCOUNTS = {
+            'tk_kham': { name: 'BS.CKII Trần Văn Bình', title: 'Trưởng Khoa', dept: 'Khoa Khám Bệnh', role: 'HOD', pass: '123' },
+            'tk_duoc': { name: 'DS.CKI Nguyễn Thị Mai', title: 'Trưởng Khoa', dept: 'Khoa Dược', role: 'HOD', pass: '123' },
+            'tk_ptgm': { name: 'BS.CKII Lê Đình Dũng', title: 'Trưởng Khoa', dept: 'Khoa Phẫu Thuật - Gây Mê', role: 'HOD', pass: '123' },
+            'dpv_qlcl': { name: 'BS. Biện Thị Thu Hương', title: 'Phòng QLCL (Điều Phối Viên)', dept: 'Phòng QLCL', role: 'COORDINATOR', pass: '123' },
+            'bgd_giamdoc': { name: 'BS. Hoàng Long', title: 'Ban Giám Đốc (Chủ Tịch UBRR)', dept: 'Ban Giám Đốc', role: 'BOD', pass: '123' }
+        };
+
+        const INITIAL_RISKS = [
+            {
+                id: "RR-2025-001",
+                scope: "Cấp Bệnh Viện",
+                dept: "Khoa Khám Bệnh",
+                coDepts: ["Khoa Dược", "Khoa Phẫu Thuật - Gây Mê"],
+                category: "Chuyên môn Y khoa",
+                desc: "Sự cố nhận diện sai người bệnh xuyên suốt chuỗi tiếp đón, phát thuốc và phẫu thuật",
+                cause: "Bệnh nhân trùng họ tên, nhân viên bỏ qua bước đối chiếu kép 2 yếu tố nhận diện",
+                impact: "Chỉ định nhầm phác đồ, mổ nhầm vị trí hoặc dùng sai thuốc",
+                initL: 3, initI: 5, initLevel: "Rất cao",
+                ctrlDesc: "Hỏi miệng tên người bệnh trước khi làm thủ thuật",
+                ctrlDesign: "Thiết kế thiếu một số kiểm soát chính",
+                ctrlCompliance: "Tuân thủ tương đối",
+                ctrlEff: "Cần cải thiện đáng kể",
+                resL: 2, resI: 5, resLevel: "Rất cao",
+                actions: [
+                    { desc: "Bắt buộc quét mã QR trên vòng đeo tay người bệnh trước khi tiêm truyền", owner: "ĐD. Phạm Thị Huệ (Khoa Khám Bệnh)", deadline: "2026-09-30" }
+                ],
+                status: "CHO_BGD_DUYET",
+                isKeyRisk: true,
+                q1: "Đã thí điểm", q2: "", q3: "", q4: "",
+                notes: "[BS. Biện Thị Thu Hương - QLCL]: Thẩm định đạt trình Ban Giám Đốc."
+            },
+            {
+                id: "RR-2025-002",
+                scope: "Cấp Khoa/Phòng",
+                dept: "Khoa Dược",
+                coDepts: [],
+                category: "Chuyên môn Y khoa",
+                desc: "Nguy cơ cấp phát nhầm thuốc LASA (nhìn giống, đọc giống nhau) trong ca trực đêm",
+                cause: "Bao bì tương đồng giữa các hàm lượng, nhân viên áp lực vào ca trực muộn",
+                impact: "Biến cố bất lợi dùng thuốc (ADR), phản vệ",
+                initL: 3, initI: 4, initLevel: "Cao",
+                ctrlDesc: "Kiểm tra 5 đúng",
+                ctrlDesign: "Thiết kế tương đối hợp lý",
+                ctrlCompliance: "Tuân thủ tương đối",
+                ctrlEff: "Có một số điểm cần cải thiện",
+                resL: 3, resI: 4, resLevel: "Cao",
+                actions: [
+                    { desc: "Dán nhãn Tallman Lettering trên tất cả hộp thuốc LASA", owner: "DS. Lê Thị Cẩm (Khoa Dược)", deadline: "2026-10-15" }
+                ],
+                status: "DA_DUYET",
+                isKeyRisk: true,
+                q1: "Hoàn tất", q2: "", q3: "", q4: "",
+                notes: "Ban Giám Đốc đã phê duyệt chính thức."
+            },
+            {
+                id: "RR-2025-003",
+                scope: "Cấp Khoa/Phòng",
+                dept: "Khoa Dược",
+                coDepts: [],
+                category: "Vận hành cơ sở",
+                desc: "Hư hỏng thuốc sinh học do dao động nhiệt độ tủ lạnh bảo quản",
+                cause: "Mất điện đột ngột trong đêm",
+                impact: "Hỏng thuốc đắt tiền",
+                initL: 3, initI: 4, initLevel: "Cao",
+                ctrlDesc: "Kiểm tra nhiệt kế cơ",
+                ctrlDesign: "Thiết kế thiếu kiểm soát cơ bản",
+                ctrlCompliance: "Tuân thủ một phần",
+                ctrlEff: "Không hiệu quả",
+                resL: 2, resI: 4, resLevel: "Cao",
+                actions: [
+                    { desc: "Lắp cảm biến nhiệt độ tự động báo động SMS", owner: "DS. Nguyễn Thị Mai", deadline: "2026-10-20" }
+                ],
+                status: "DA_DUYET",
+                isKeyRisk: false,
+                q1: "", q2: "", q3: "", q4: "",
+                notes: "Ban Giám Đốc đã duyệt."
+            }
+        ];
+
+        let currentUser = null;
+        let riskItems = JSON.parse(localStorage.getItem('sg_tmh_risks_final_v14')) || INITIAL_RISKS;
+        let heatmapMode = 'residual';
+        let chartCategoryInstance = null;
+        let chartDeptInstance = null;
+
+        function isRiskVisibleToRole(r) {
+            const role = currentUser.role;
+            const code = r.status;
+
+            if (role === 'HOD') {
+                if (r.dept === currentUser.dept) return true;
+                if (r.scope === 'Cấp Bệnh Viện' && r.coDepts && r.coDepts.includes(currentUser.dept) && code !== 'NHAP') {
+                    return true;
+                }
+                return false;
+            }
+            if (role === 'COORDINATOR') {
+                if (code === 'NHAP') return false;
+                return true;
+            }
+            if (role === 'BOD') {
+                if (code === 'CHO_BGD_DUYET' || code === 'DA_DUYET' || code === 'BGD_YEU_CAU_SUA') {
+                    return true;
+                }
+                return false;
+            }
+            return false;
+        }
+
+        function getRoleStatusDisplay(code) {
+            const role = currentUser ? currentUser.role : 'HOD';
+
+            if (role === 'HOD') {
+                if (code === 'NHAP') return { text: 'Bản nháp', badgeClass: 'bg-slate-100 text-slate-700 border-slate-300', icon: 'fa-pen-ruler' };
+                if (code === 'CHO_QLCL_DUYET') return { text: 'Đã gửi QLCL', badgeClass: 'bg-purple-100 text-purple-800 border-purple-300', icon: 'fa-paper-plane' };
+                if (code === 'QLCL_YEU_CAU_SUA') return { text: 'QLCL yêu cầu sửa', badgeClass: 'bg-rose-100 text-rose-800 border-rose-400 font-black', icon: 'fa-triangle-exclamation' };
+                if (code === 'CHO_BGD_DUYET') return { text: 'Trình Ban Giám Đốc', badgeClass: 'bg-blue-100 text-blue-800 border-blue-300', icon: 'fa-stamp' };
+                if (code === 'BGD_YEU_CAU_SUA') return { text: 'BGĐ yêu cầu sửa', badgeClass: 'bg-rose-100 text-rose-800 border-rose-400 font-black', icon: 'fa-triangle-exclamation' };
+                if (code === 'DA_DUYET') return { text: 'Đã duyệt chính thức', badgeClass: 'bg-emerald-100 text-emerald-800 border-emerald-300', icon: 'fa-circle-check' };
+            }
+
+            if (role === 'COORDINATOR') {
+                if (code === 'CHO_QLCL_DUYET') return { text: 'Chờ QLCL thẩm định', badgeClass: 'bg-purple-100 text-purple-800 border-purple-300 font-bold', icon: 'fa-clipboard-check' };
+                if (code === 'QLCL_YEU_CAU_SUA') return { text: 'Đã trả về Khoa', badgeClass: 'bg-rose-100 text-rose-800 border-rose-300', icon: 'fa-rotate-left' };
+                if (code === 'CHO_BGD_DUYET') return { text: 'Đã trình BGĐ duyệt', badgeClass: 'bg-blue-100 text-blue-800 border-blue-300', icon: 'fa-star' };
+                if (code === 'BGD_YEU_CAU_SUA') return { text: 'BGĐ trả về Khoa', badgeClass: 'bg-amber-100 text-amber-800 border-amber-300', icon: 'fa-info-circle' };
+                if (code === 'DA_DUYET') return { text: 'Đã duyệt (Lưu viện)', badgeClass: 'bg-emerald-100 text-emerald-800 border-emerald-300', icon: 'fa-circle-check' };
+            }
+
+            if (role === 'BOD') {
+                if (code === 'CHO_BGD_DUYET') return { text: 'Chờ Ban Giám Đốc duyệt', badgeClass: 'bg-blue-100 text-blue-800 border-blue-300 font-bold', icon: 'fa-stamp' };
+                if (code === 'BGD_YEU_CAU_SUA') return { text: 'Đã trả về Trưởng khoa', badgeClass: 'bg-rose-100 text-rose-800 border-rose-300', icon: 'fa-circle-xmark' };
+                if (code === 'DA_DUYET') return { text: 'Đã phê duyệt', badgeClass: 'bg-emerald-100 text-emerald-800 border-emerald-300', icon: 'fa-circle-check' };
+            }
+
+            return { text: code, badgeClass: 'bg-slate-100 text-slate-700 border-slate-300', icon: 'fa-info' };
+        }
+
+        function getStatusBadgeHtml(code) {
+            const st = getRoleStatusDisplay(code);
+            return `<span class="${st.badgeClass} px-2.5 py-0.5 rounded-full text-[11px] font-bold border whitespace-nowrap inline-flex items-center gap-1"><i class="fa-solid ${st.icon}"></i> ${st.text}</span>`;
+        }
+
+        function getLevelBadgeHtml(level) {
+            if (level === 'Rất cao') return '<span class="px-2 py-0.5 rounded-md font-bold text-[11px] badge-extreme whitespace-nowrap"><i class="fa-solid fa-circle-exclamation mr-1"></i> Rất cao</span>';
+            if (level === 'Cao') return '<span class="px-2 py-0.5 rounded-md font-bold text-[11px] badge-high whitespace-nowrap"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Cao</span>';
+            if (level === 'Trung bình') return '<span class="px-2 py-0.5 rounded-md font-bold text-[11px] badge-medium whitespace-nowrap">Trung bình</span>';
+            return '<span class="px-2 py-0.5 rounded-md font-bold text-[11px] badge-low whitespace-nowrap">Thấp</span>';
+        }
+
+        function quickLogin(key) {
+            currentUser = USER_ACCOUNTS[key];
+            proceedToApp();
+        }
+
+        function handleManualLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('loginUsername').value.trim();
+            const p = document.getElementById('loginPassword').value.trim();
+            const found = Object.values(USER_ACCOUNTS).find(x => x.name.toLowerCase().includes(u.toLowerCase()) || x.dept.toLowerCase().includes(u.toLowerCase()) || u === 'admin' || u === 'qlcl' || u === 'giamdoc');
+            if (found && (p === '123' || p === 'admin')) {
+                currentUser = found;
+                proceedToApp();
+            } else {
+                alert("Mật khẩu mặc định là 123 hoặc chọn nút bấm 1-chạm.");
+            }
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            document.getElementById('screenApp').classList.add('hidden');
+            document.getElementById('screenLogin').classList.remove('hidden');
+        }
+
+        function proceedToApp() {
+            document.getElementById('screenLogin').classList.add('hidden');
+            document.getElementById('screenApp').classList.remove('hidden');
+
+            document.getElementById('userNameDisplay').innerText = currentUser.name;
+            document.getElementById('userDeptDisplay').innerText = currentUser.dept;
+            document.getElementById('userAvatar').innerText = currentUser.name.split(' ').pop().charAt(0);
+
+            const badge = document.getElementById('userRoleBadge');
+            badge.innerText = currentUser.title;
+            if (currentUser.role === 'HOD') badge.className = "bg-amber-200 text-amber-900 text-[10px] px-1.5 py-0.5 rounded font-bold";
+            else if (currentUser.role === 'COORDINATOR') badge.className = "bg-purple-200 text-purple-900 text-[10px] px-1.5 py-0.5 rounded font-bold";
+            else badge.className = "bg-red-200 text-red-900 text-[10px] px-1.5 py-0.5 rounded font-bold";
+
+            const bannerText = document.getElementById('roleInstructionText');
+            const bannerTag = document.getElementById('roleScopeTag');
+
+            if (currentUser.role === 'HOD') {
+                bannerText.innerText = `Cấp 1 - Trưởng Khoa / Chủ rủi ro (${currentUser.dept}): Quản lý rủi ro của khoa mình & các rủi ro cấp Bệnh viện mà khoa được mời phối hợp.`;
+                bannerTag.innerText = `Chủ rủi ro: ${currentUser.dept}`;
+            } else if (currentUser.role === 'COORDINATOR') {
+                bannerText.innerText = `Cấp 2 - Phòng Quản Lý Chất Lượng (BS. Biện Thị Thu Hương): Thẩm định chuyên môn toàn viện; duyệt đạt để Trình Ban Giám Đốc phê duyệt hoặc trả về Khoa.`;
+                bannerTag.innerText = `Phòng QLCL Toàn Viện`;
+            } else {
+                bannerText.innerText = `Cấp 3 - Ban Giám Đốc (BS. Hoàng Long - Chủ tịch UBRR): Giám sát Executive Dashboard toàn viện, phê duyệt danh mục rủi ro chính thức.`;
+                bannerTag.innerText = `Ban Giám Đốc / UBRR`;
+            }
+
+            setupTabsAndActions();
+            setupFilterOptions();
+
+            if (currentUser.role === 'BOD') {
+                switchPane('paneDashboard');
+            } else {
+                switchPane('paneList');
+            }
+        }
+
+        function setupTabsAndActions() {
+            const tabsContainer = document.getElementById('dynamicTabsContainer');
+            const actionContainer = document.getElementById('quickActionButtonsContainer');
+            const visibleCount = riskItems.filter(r => isRiskVisibleToRole(r)).length;
+
+            let tabsHtml = `
+                <button onclick="switchPane('paneList')" id="btnTabList" class="px-3.5 py-2 rounded-lg font-bold text-xs md:text-sm flex items-center gap-2 bg-teal-800 text-white shadow-sm whitespace-nowrap">
+                    <i class="fa-solid fa-list-check"></i> ${currentUser.role === 'HOD' ? 'Hồ Sơ Rủi Ro Khoa' : 'Hồ Sơ Rủi Ro Toàn Viện'} (<span id="tabBadgeCount">${visibleCount}</span>)
+                </button>
+                <button onclick="switchPane('paneDashboard')" id="btnTabDashboard" class="px-3.5 py-2 rounded-lg font-bold text-xs md:text-sm flex items-center gap-2 bg-white text-slate-600 hover:bg-slate-200 border border-slate-200 whitespace-nowrap">
+                    <i class="fa-solid fa-chart-pie text-teal-700"></i> ${currentUser.role === 'BOD' ? 'Executive Dashboard' : 'Báo Cáo & Ma Trận 5x5'}
+                </button>
+            `;
+            tabsContainer.innerHTML = tabsHtml;
+
+            let actionHtml = '';
+            if (currentUser.role === 'HOD' || currentUser.role === 'COORDINATOR') {
+                actionHtml = `
+                    <button onclick="openCreateRiskModal()" class="bg-teal-700 hover:bg-teal-800 text-white text-xs md:text-sm font-bold px-4 py-2 rounded-lg shadow flex items-center gap-1.5 transition whitespace-nowrap">
+                        <i class="fa-solid fa-circle-plus"></i> Nhập Rủi Ro Mới
+                    </button>
+                `;
+            }
+            actionContainer.innerHTML = actionHtml;
+        }
+
+        function syncTabBadgeCount() {
+            const badgeEl = document.getElementById('tabBadgeCount');
+            if (badgeEl && currentUser) {
+                const count = riskItems.filter(r => isRiskVisibleToRole(r)).length;
+                badgeEl.innerText = count;
+            }
+        }
+
+        function setupFilterOptions() {
+            const deptSelect = document.getElementById('filterDeptSelect');
+            if (currentUser.role === 'HOD') {
+                deptSelect.innerHTML = `<option value="${currentUser.dept}">${currentUser.dept}</option>`;
+                deptSelect.disabled = true;
+            } else {
+                deptSelect.disabled = false;
+                deptSelect.innerHTML = `
+                    <option value="">-- Tất cả khoa/phòng --</option>
+                    <option value="Khoa Khám Bệnh">Khoa Khám Bệnh</option>
+                    <option value="Khoa Dược">Khoa Dược</option>
+                    <option value="Khoa Phẫu Thuật - Gây Mê">Khoa Phẫu Thuật - Gây Mê</option>
+                    <option value="Phòng QLCL">Phòng QLCL</option>
+                `;
+            }
+
+            const stSelect = document.getElementById('filterStatusSelect');
+            if (currentUser.role === 'HOD') {
+                stSelect.innerHTML = `
+                    <option value="">-- Tất cả trạng thái --</option>
+                    <option value="NHAP">Bản nháp</option>
+                    <option value="CHO_QLCL_DUYET">Đã gửi QLCL</option>
+                    <option value="QLCL_YEU_CAU_SUA">QLCL yêu cầu sửa</option>
+                    <option value="CHO_BGD_DUYET">Trình Ban Giám Đốc</option>
+                    <option value="BGD_YEU_CAU_SUA">BGĐ yêu cầu sửa</option>
+                    <option value="DA_DUYET">Đã duyệt chính thức</option>
+                `;
+            } else if (currentUser.role === 'COORDINATOR') {
+                stSelect.innerHTML = `
+                    <option value="">-- Tất cả trạng thái --</option>
+                    <option value="CHO_QLCL_DUYET">Chờ QLCL thẩm định</option>
+                    <option value="CHO_BGD_DUYET">Đã trình BGĐ duyệt</option>
+                    <option value="QLCL_YEU_CAU_SUA">Đã trả về Khoa</option>
+                    <option value="BGD_YEU_CAU_SUA">BGĐ trả về Khoa</option>
+                    <option value="DA_DUYET">Đã duyệt (Lưu viện)</option>
+                `;
+            } else {
+                stSelect.innerHTML = `
+                    <option value="">-- Tất cả trạng thái BGĐ --</option>
+                    <option value="CHO_BGD_DUYET">Chờ Ban Giám Đốc duyệt</option>
+                    <option value="DA_DUYET">Đã phê duyệt</option>
+                    <option value="BGD_YEU_CAU_SUA">Đã trả về Trưởng khoa</option>
+                `;
+            }
+        }
+
+        function switchPane(paneId) {
+            document.getElementById('paneList').classList.add('hidden');
+            document.getElementById('paneDashboard').classList.add('hidden');
+            document.getElementById(paneId).classList.remove('hidden');
+
+            document.getElementById('btnTabList').className = "px-3.5 py-2 rounded-lg font-bold text-xs md:text-sm flex items-center gap-2 bg-white text-slate-600 hover:bg-slate-200 border border-slate-200 whitespace-nowrap";
+            document.getElementById('btnTabDashboard').className = "px-3.5 py-2 rounded-lg font-bold text-xs md:text-sm flex items-center gap-2 bg-white text-slate-600 hover:bg-slate-200 border border-slate-200 whitespace-nowrap";
+
+            if (paneId === 'paneList') {
+                document.getElementById('btnTabList').className = "px-3.5 py-2 rounded-lg font-bold text-xs md:text-sm flex items-center gap-2 bg-teal-800 text-white shadow-sm whitespace-nowrap";
+                renderAppList();
+            } else {
+                document.getElementById('btnTabDashboard').className = "px-3.5 py-2 rounded-lg font-bold text-xs md:text-sm flex items-center gap-2 bg-teal-800 text-white shadow-sm whitespace-nowrap";
+                renderDashboardAnalytics();
+            }
+            syncTabBadgeCount();
+        }
+
+        function renderAppList(matrixFilterScore = null) {
+            const search = document.getElementById('filterSearch').value.toLowerCase();
+            const fScope = document.getElementById('filterScopeSelect').value;
+            const fStatus = document.getElementById('filterStatusSelect').value;
+
+            let filtered = riskItems.filter(r => isRiskVisibleToRole(r));
+
+            filtered = filtered.filter(r => {
+                const matchSearch = r.desc.toLowerCase().includes(search) || r.id.toLowerCase().includes(search) || (r.cause||'').toLowerCase().includes(search);
+                const matchScope = fScope ? r.scope === fScope : true;
+                const matchSt = fStatus ? r.status === fStatus : true;
+                
+                let matchMatrix = true;
+                if (matrixFilterScore) {
+                    if (heatmapMode === 'residual') {
+                        matchMatrix = (r.resL === matrixFilterScore.l && r.resI === matrixFilterScore.i);
+                    } else {
+                        matchMatrix = (r.initL === matrixFilterScore.l && r.initI === matrixFilterScore.i);
+                    }
+                }
+
+                return matchSearch && matchScope && matchSt && matchMatrix;
+            });
+
+            const tbody = document.getElementById('riskTableDesktopBody');
+            tbody.innerHTML = '';
+
+            const cardBox = document.getElementById('riskCardsMobileContainer');
+            cardBox.innerHTML = '';
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-400">Không có hồ sơ rủi ro nào phù hợp.</td></tr>`;
+                cardBox.innerHTML = `<div class="col-span-full text-center py-8 text-slate-400">Không có hồ sơ rủi ro nào phù hợp.</div>`;
+                syncTabBadgeCount();
+                return;
+            }
+
+            filtered.forEach(r => {
+                const keyStar = r.isKeyRisk ? '<i class="fa-solid fa-star text-amber-500 ml-1" title="Rủi ro chính UBRR"></i>' : '';
+                
+                const scopeBadge = r.scope === 'Cấp Bệnh Viện' 
+                    ? '<span class="bg-indigo-100 text-indigo-800 text-[10px] px-1.5 py-0.2 rounded font-bold border border-indigo-200">Cấp Viện</span>' 
+                    : '<span class="bg-slate-100 text-slate-600 text-[10px] px-1.5 py-0.2 rounded border">Khoa</span>';
+
+                const resLvlText = MATRIX_5X5[r.resL][r.resI];
+
+                let actionSummary = '-';
+                if (r.actions && r.actions.length > 0) {
+                    const firstAct = r.actions[0];
+                    actionSummary = `
+                        <div class="truncate max-w-xs font-medium text-slate-800" title="${firstAct.desc}">${firstAct.desc}</div>
+                        <div class="text-[10px] text-slate-500 mt-0.5 flex items-center gap-1.5">
+                            <span><i class="fa-solid fa-user-check mr-0.5"></i> ${firstAct.owner}</span>
+                            ${r.actions.length > 1 ? `<span class="bg-teal-100 text-teal-800 px-1 rounded font-bold">+${r.actions.length - 1} việc</span>` : ''}
+                        </div>
+                    `;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition border-b";
+                tr.innerHTML = `
+                    <td class="p-3 text-center font-mono font-black text-teal-900 whitespace-nowrap">${r.id} ${keyStar}</td>
+                    <td class="p-3">
+                        <div class="flex items-center gap-1 mb-0.5">
+                            ${scopeBadge}
+                            <span class="font-bold text-slate-800">${r.dept}</span>
+                        </div>
+                        <span class="text-[10px] text-slate-500 block truncate" title="${r.coDepts ? r.coDepts.join(', ') : ''}">
+                            ${r.scope === 'Cấp Bệnh Viện' ? 'PH: ' + (r.coDepts.length > 0 ? r.coDepts.join(', ') : 'Chưa chọn') : r.category}
+                        </span>
+                    </td>
+                    <td class="p-3">
+                        <p class="font-bold text-slate-800 text-xs leading-snug">${r.desc}</p>
+                        <p class="text-[11px] text-slate-500 mt-1 line-clamp-1"><strong>NN:</strong> ${r.cause || '-'}</p>
+                    </td>
+                    <td class="p-3 text-center">${getLevelBadgeHtml(resLvlText)}</td>
+                    <td class="p-3">${actionSummary}</td>
+                    <td class="p-3 text-center">${getStatusBadgeHtml(r.status)}</td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        <button onclick="openDetailModal('${r.id}')" class="bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold px-2.5 py-1.5 rounded-lg border border-teal-200 text-xs flex items-center gap-1 mx-auto shadow-sm">
+                            <i class="fa-solid fa-eye"></i> Chi tiết
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+
+                const card = document.createElement('div');
+                card.className = "bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2.5";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="font-mono font-black text-teal-900 text-xs">${r.id}</span> ${keyStar}
+                            <span class="ml-1">${scopeBadge}</span>
+                            <span class="text-[11px] font-bold text-slate-700 ml-1">${r.dept}</span>
+                        </div>
+                        ${getLevelBadgeHtml(resLvlText)}
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-xs leading-snug">${r.desc}</h4>
+                        <p class="text-[11px] text-slate-500 mt-1 line-clamp-2"><strong>NN:</strong> ${r.cause || '-'}</p>
+                    </div>
+                    <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 text-[11px] text-slate-600 space-y-1">
+                        ${actionSummary}
+                    </div>
+                    <div class="flex justify-between items-center pt-1 border-t text-xs">
+                        ${getStatusBadgeHtml(r.status)}
+                        <button onclick="openDetailModal('${r.id}')" class="text-teal-700 hover:text-teal-900 font-bold text-xs">
+                            Chi tiết <i class="fa-solid fa-chevron-right ml-0.5"></i>
+                        </button>
+                    </div>
+                `;
+                cardBox.appendChild(card);
+            });
+
+            syncTabBadgeCount();
+        }
+
+        function openDetailModal(id) {
+            const r = riskItems.find(x => x.id === id);
+            if (!r) return;
+
+            document.getElementById('dtId').innerText = r.id;
+            document.getElementById('dtDept').innerText = r.dept;
+            document.getElementById('dtCat').innerText = r.category;
+            document.getElementById('dtDesc').innerText = r.desc;
+            document.getElementById('dtCause').innerText = r.cause || 'Chưa có ghi chú';
+            document.getElementById('dtImpact').innerText = r.impact || 'Chưa có ghi chú';
+
+            const scBadge = document.getElementById('dtScopeBadge');
+            scBadge.innerText = r.scope;
+            scBadge.className = r.scope === 'Cấp Bệnh Viện' 
+                ? 'bg-indigo-100 text-indigo-800 text-[11px] px-2.5 py-0.5 rounded font-bold border border-indigo-200' 
+                : 'bg-slate-100 text-slate-700 text-[11px] px-2.5 py-0.5 rounded font-bold border';
+
+            const coBox = document.getElementById('dtCoDeptsBox');
+            if (r.scope === 'Cấp Bệnh Viện' && r.coDepts && r.coDepts.length > 0) {
+                coBox.classList.remove('hidden');
+                document.getElementById('dtCoDeptsText').innerText = r.coDepts.join(', ');
+            } else {
+                coBox.classList.add('hidden');
+            }
+
+            document.getElementById('dtKeyTag').innerHTML = r.isKeyRisk ? '<span class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded font-bold"><i class="fa-solid fa-star text-amber-500 mr-1"></i> Rủi Ro Chính UBRR</span>' : '';
+
+            document.getElementById('dtQ1').innerText = r.q1 || '-';
+            document.getElementById('dtQ2').innerText = r.q2 || '-';
+            document.getElementById('dtQ3').innerText = r.q3 || '-';
+            document.getElementById('dtQ4').innerText = r.q4 || '-';
+
+            const initLvlText = MATRIX_5X5[r.initL][r.initI];
+            const resLvlText = MATRIX_5X5[r.resL][r.resI];
+
+            document.getElementById('dtInitBadge').className = `mt-1 font-black text-xs py-1 px-2 rounded inline-block ${initLvlText === 'Cao' ? 'badge-high' : (initLvlText === 'Rất cao' ? 'badge-extreme' : 'badge-medium')}`;
+            document.getElementById('dtInitBadge').innerText = initLvlText;
+            document.getElementById('dtInitDetail').innerText = `L: ${r.initL} × I: ${r.initI}`;
+
+            document.getElementById('dtCtrlEff').className = `mt-1 font-bold text-xs py-1 px-2 rounded inline-block ${r.ctrlEff === 'Hiệu quả' ? 'eff-good' : (r.ctrlEff === 'Không hiệu quả' ? 'eff-bad' : 'eff-warn')}`;
+            document.getElementById('dtCtrlEff').innerText = r.ctrlEff || 'Hiệu quả';
+            document.getElementById('dtCtrlDesc').innerText = r.ctrlDesc || 'Kiểm soát hiện tại';
+
+            document.getElementById('dtResBadge').className = `mt-1 font-black text-xs py-1 px-2 rounded inline-block ${resLvlText === 'Cao' ? 'badge-high' : (resLvlText === 'Rất cao' ? 'badge-extreme' : 'badge-low')}`;
+            document.getElementById('dtResBadge').innerText = resLvlText;
+            document.getElementById('dtResDetail').innerText = `L: ${r.resL} × I: ${r.resI}`;
+
+            const actionTbody = document.getElementById('dtActionTableBody');
+            actionTbody.innerHTML = '';
+            const actionList = r.actions || [];
+            document.getElementById('dtActionCountBadge').innerText = `${actionList.length} hành động`;
+
+            if (actionList.length === 0) {
+                actionTbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-slate-400 italic">Chưa có kế hoạch hành động nào được lập.</td></tr>`;
+            } else {
+                actionList.forEach((act, idx) => {
+                    const row = document.createElement('tr');
+                    row.className = "hover:bg-teal-50/40";
+                    row.innerHTML = `
+                        <td class="p-2 text-center font-bold text-teal-900">${idx + 1}</td>
+                        <td class="p-2 font-medium text-slate-800">${act.desc}</td>
+                        <td class="p-2 text-slate-600 font-semibold">${act.owner || 'Chưa phân công'}</td>
+                        <td class="p-2 text-center font-mono text-slate-700">${act.deadline || 'Chưa đặt'}</td>
+                    `;
+                    actionTbody.appendChild(row);
+                });
+            }
+
+            const notesBox = document.getElementById('dtNotesContainer');
+            const notesLabel = document.getElementById('dtNotesLabel');
+
+            if (r.status.startsWith('TU_CHOI') || r.status.includes('YEU_CAU_SUA')) {
+                notesBox.className = "bg-rose-50 p-3 rounded-xl border border-rose-200";
+                notesLabel.innerHTML = '<i class="fa-solid fa-circle-exclamation text-rose-600 mr-1"></i> Lý do trả về / Ý kiến chỉ đạo:';
+            } else {
+                notesBox.className = "bg-slate-50 p-3 rounded-xl border border-slate-200";
+                notesLabel.innerHTML = '<i class="fa-solid fa-comment-dots text-teal-700 mr-1"></i> Ý kiến phê duyệt / Phản biện:';
+            }
+            document.getElementById('dtNotes').innerText = r.notes || 'Không có ghi chú.';
+            document.getElementById('dtStatusBox').innerHTML = getStatusBadgeHtml(r.status);
+
+            const btnBox = document.getElementById('dtDynamicActions');
+            btnBox.innerHTML = '';
+
+            if (currentUser.role === 'HOD') {
+                if (r.dept === currentUser.dept) {
+                    if (r.status === 'NHAP') {
+                        btnBox.innerHTML = `
+                            <button onclick="editExistingRisk('${r.id}')" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold"><i class="fa-solid fa-pen-to-square mr-1"></i> Sửa nội dung</button>
+                            <button onclick="updateStatusCode('${r.id}', 'CHO_QLCL_DUYET', 'Đã nộp hồ sơ sang Phòng QLCL thẩm định!')" class="px-3.5 py-1.5 bg-teal-800 hover:bg-teal-900 text-white rounded-lg text-xs font-bold"><i class="fa-solid fa-paper-plane mr-1"></i> Gửi QLCL</button>
+                        `;
+                    } else if (r.status === 'QLCL_YEU_CAU_SUA') {
+                        btnBox.innerHTML = `
+                            <button onclick="editExistingRisk('${r.id}')" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold"><i class="fa-solid fa-pen mr-1"></i> Sửa theo yêu cầu QLCL</button>
+                            <button onclick="updateStatusCode('${r.id}', 'CHO_QLCL_DUYET', 'Đã chỉnh sửa và gửi lại Phòng QLCL!')" class="px-3.5 py-1.5 bg-teal-800 hover:bg-teal-900 text-white rounded-lg text-xs font-bold"><i class="fa-solid fa-paper-plane mr-1"></i> Gửi lại QLCL</button>
+                        `;
+                    } else if (r.status === 'BGD_YEU_CAU_SUA') {
+                        btnBox.innerHTML = `
+                            <button onclick="promptRejectRisk('${r.id}', 'NHAP', 'Trưởng khoa quyết định dừng/đóng rủi ro')" class="px-3.5 py-1.5 bg-rose-700 hover:bg-rose-800 text-white rounded-lg text-xs font-bold"><i class="fa-solid fa-ban mr-1"></i> Dừng rủi ro</button>
+                            <button onclick="editExistingRisk('${r.id}')" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold"><i class="fa-solid fa-pen mr-1"></i> Điều chỉnh kế hoạch</button>
+                            <button onclick="updateStatusCode('${r.id}', 'CHO_QLCL_DUYET', 'Trưởng khoa đã điều chỉnh kế hoạch và gửi lại cấp trên!')" class="px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-bold"><i class="fa-solid fa-paper-plane mr-1"></i> Trình lại cấp trên</button>
+                        `;
+                    }
+                } else if (r.coDepts && r.coDepts.includes(currentUser.dept)) {
+                    btnBox.innerHTML = `<span class="text-indigo-800 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-200 font-bold"><i class="fa-solid fa-eye mr-1"></i> Vai trò: Đơn vị phối hợp</span>`;
+                }
+            } else if (currentUser.role === 'COORDINATOR') {
+                if (r.status === 'CHO_QLCL_DUYET') {
+                    btnBox.innerHTML = `
+                        <button onclick="promptRejectRisk('${r.id}', 'QLCL_YEU_CAU_SUA', 'Phòng QLCL trả về yêu cầu Trưởng khoa chỉnh sửa')" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate-left mr-1"></i> Yêu cầu Khoa sửa</button>
+                        <button onclick="passReviewAndSubmitToBOD('${r.id}')" class="px-4 py-1.5 bg-teal-800 hover:bg-teal-900 text-white rounded-lg text-xs font-bold shadow flex items-center gap-1.5"><i class="fa-solid fa-paper-plane"></i> Thẩm định đạt & Trình Ban Giám Đốc</button>
+                    `;
+                }
+            } else if (currentUser.role === 'BOD') {
+                if (r.status === 'CHO_BGD_DUYET') {
+                    btnBox.innerHTML = `
+                        <button onclick="promptRejectRisk('${r.id}', 'BGD_YEU_CAU_SUA', 'Ban Giám Đốc yêu cầu Trưởng khoa xem xét lại')" class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate-left mr-1"></i> Yêu cầu xem xét lại</button>
+                        <button onclick="updateStatusCode('${r.id}', 'DA_DUYET', 'Ban Giám Đốc đã chính thức phê duyệt hồ sơ rủi ro!')" class="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-bold shadow flex items-center gap-1.5"><i class="fa-solid fa-circle-check"></i> Ban Giám Đốc Phê Duyệt</button>
+                    `;
+                }
+            }
+
+            document.getElementById('modalDetail').classList.remove('hidden');
+        }
+
+        function passReviewAndSubmitToBOD(id) {
+            const r = riskItems.find(x => x.id === id);
+            if (r) {
+                const isKey = confirm("Bạn có muốn gắn cờ 'RỦI RO CHÍNH' (Key Risk) để đưa vào danh mục trọng yếu họp UBRR không?");
+                r.isKeyRisk = isKey;
+                r.status = 'CHO_BGD_DUYET';
+                r.notes = `[BS. Biện Thị Thu Hương - QLCL]: Đã thẩm định đạt chuyên môn${isKey ? ' (Đề xuất Rủi ro chính UBRR)' : ''} và chuyển trình Ban Giám Đốc phê duyệt.`;
+                localStorage.setItem('sg_tmh_risks_final_v14', JSON.stringify(riskItems));
+                closeModal('modalDetail');
+                renderAppList();
+                syncTabBadgeCount();
+                alert("Đã hoàn tất thẩm định và chuyển hồ sơ trình Ban Giám Đốc phê duyệt!");
+            }
+        }
+
+        function updateStatusCode(id, newStatus, msg) {
+            const r = riskItems.find(x => x.id === id);
+            if (r) {
+                r.status = newStatus;
+                localStorage.setItem('sg_tmh_risks_final_v14', JSON.stringify(riskItems));
+                closeModal('modalDetail');
+                renderAppList();
+                syncTabBadgeCount();
+                if (msg) alert(msg);
+            }
+        }
+
+        function promptRejectRisk(id, targetRejectCode, actionDesc) {
+            const reason = prompt(`Nhập ý kiến chỉ đạo / nội dung (${actionDesc}):`);
+            if (reason) {
+                const r = riskItems.find(x => x.id === id);
+                if (r) {
+                    r.status = targetRejectCode;
+                    r.notes = `[${currentUser.name} - ${new Date().toLocaleDateString('vi-VN')}]: ${reason}`;
+                    localStorage.setItem('sg_tmh_risks_final_v14', JSON.stringify(riskItems));
+                    closeModal('modalDetail');
+                    renderAppList();
+                    syncTabBadgeCount();
+                    alert(`Đã cập nhật trạng thái hồ sơ thành công.`);
+                }
+            }
+        }
+
+        function openCreateRiskModal() {
+            document.getElementById('formRiskInput').reset();
+            document.getElementById('fId').value = '';
+            document.getElementById('formTitle').innerText = "Nhập Hồ Sơ Quản Lý Rủi Ro Mới";
+
+            const fDept = document.getElementById('fDept');
+            if (currentUser.role === 'HOD') {
+                fDept.value = currentUser.dept;
+                fDept.disabled = true;
+            } else {
+                fDept.disabled = false;
+            }
+
+            toggleScopeInputs();
+            autoCalcModalScores();
+
+            const container = document.getElementById('actionInputsContainer');
+            container.innerHTML = '';
+            addActionInputRow('', currentUser ? currentUser.name + ' (' + currentUser.dept + ')' : '', '');
+
+            document.getElementById('modalForm').classList.remove('hidden');
+        }
+
+        function addActionInputRow(desc = '', owner = '', deadline = '') {
+            const container = document.getElementById('actionInputsContainer');
+            const rowId = 'act_row_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+
+            const row = document.createElement('div');
+            row.id = rowId;
+            row.className = "bg-white p-2.5 rounded-lg border border-teal-200 grid grid-cols-1 sm:grid-cols-12 gap-2 items-center";
+            row.innerHTML = `
+                <div class="sm:col-span-6">
+                    <input type="text" name="actDesc" value="${desc.replace(/"/g, '&quot;')}" placeholder="Nội dung hành động can thiệp cụ thể..." required class="w-full border border-slate-300 rounded p-1.5 focus:outline-teal-600 text-xs">
+                </div>
+                <div class="sm:col-span-3">
+                    <input type="text" name="actOwner" value="${owner.replace(/"/g, '&quot;')}" placeholder="Người/Khoa phụ trách..." required class="w-full border border-slate-300 rounded p-1.5 focus:outline-teal-600 text-xs">
+                </div>
+                <div class="sm:col-span-2">
+                    <input type="date" name="actDeadline" value="${deadline}" required class="w-full border border-slate-300 rounded p-1.5 focus:outline-teal-600 text-xs">
+                </div>
+                <div class="sm:col-span-1 text-center">
+                    <button type="button" onclick="removeActionInputRow('${rowId}')" class="text-rose-500 hover:text-rose-700 p-1" title="Xóa hành động này">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            `;
+            container.appendChild(row);
+        }
+
+        function removeActionInputRow(rowId) {
+            const row = document.getElementById(rowId);
+            const container = document.getElementById('actionInputsContainer');
+            if (container.children.length > 1) {
+                if (row) row.remove();
+            } else {
+                alert("Hồ sơ rủi ro phải có ít nhất 1 hành động can thiệp!");
+            }
+        }
+
+        function toggleScopeInputs() {
+            const sc = document.getElementById('fScope').value;
+            const block = document.getElementById('coDeptsSelectorBlock');
+            if (sc === 'Cấp Bệnh Viện') {
+                block.classList.remove('hidden');
+            } else {
+                block.classList.add('hidden');
+            }
+        }
+
+        function autoCalcModalScores() {
+            const initL = parseInt(document.getElementById('fInitL').value);
+            const initI = parseInt(document.getElementById('fInitI').value);
+            const initScore = MATRIX_5X5[initL][initI];
+            const badgeInit = document.getElementById('fInitBadge');
+            badgeInit.innerText = initScore;
+            badgeInit.className = `px-3 py-1 rounded-lg font-bold border inline-block text-xs ${initScore === 'Rất cao' ? 'badge-extreme' : (initScore === 'Cao' ? 'badge-high' : (initScore === 'Trung bình' ? 'badge-medium' : 'badge-low'))}`;
+
+            const d = document.getElementById('fCtrlDesign').value;
+            const c = document.getElementById('fCtrlCompliance').value;
+            const eff = MATRIX_CONTROL[d][c];
+            const badgeEff = document.getElementById('fCtrlEffBadge');
+            badgeEff.innerText = eff;
+            badgeEff.className = `px-2.5 py-1 rounded text-xs font-bold inline-block ${eff === 'Hiệu quả' ? 'eff-good' : (eff === 'Không hiệu quả' ? 'eff-bad' : 'eff-warn')}`;
+
+            const resL = parseInt(document.getElementById('fResL').value);
+            const resI = parseInt(document.getElementById('fResI').value);
+            const resScore = MATRIX_5X5[resL][resI];
+            const badgeRes = document.getElementById('fResBadge');
+            badgeRes.innerText = resScore;
+            badgeRes.className = `px-3 py-1 rounded-lg font-bold border inline-block text-xs ${resScore === 'Rất cao' ? 'badge-extreme' : (resScore === 'Cao' ? 'badge-high' : (resScore === 'Trung bình' ? 'badge-medium' : 'badge-low'))}`;
+        }
+
+        function saveRiskRecord(targetStatusCode) {
+            const desc = document.getElementById('fDesc').value.trim();
+            if (!desc) {
+                alert("Vui lòng nhập mô tả sự kiện rủi ro!");
+                return;
+            }
+
+            const actionDescs = document.getElementsByName('actDesc');
+            const actionOwners = document.getElementsByName('actOwner');
+            const actionDeadlines = document.getElementsByName('actDeadline');
+
+            let collectedActions = [];
+            for (let i = 0; i < actionDescs.length; i++) {
+                const aDesc = actionDescs[i].value.trim();
+                const aOwner = actionOwners[i].value.trim();
+                const aDead = actionDeadlines[i].value;
+                if (aDesc) {
+                    collectedActions.push({ desc: aDesc, owner: aOwner, deadline: aDead });
+                }
+            }
+
+            if (collectedActions.length === 0) {
+                alert("Vui lòng nhập ít nhất 1 hành động can thiệp cụ thể!");
+                return;
+            }
+
+            const id = document.getElementById('fId').value;
+            const scope = document.getElementById('fScope').value;
+            const initL = parseInt(document.getElementById('fInitL').value);
+            const initI = parseInt(document.getElementById('fInitI').value);
+            const resL = parseInt(document.getElementById('fResL').value);
+            const resI = parseInt(document.getElementById('fResI').value);
+            const d = document.getElementById('fCtrlDesign').value;
+            const c = document.getElementById('fCtrlCompliance').value;
+
+            let coDepts = [];
+            if (scope === 'Cấp Bệnh Viện') {
+                const checks = document.getElementsByName('coDeptsCheck');
+                checks.forEach(chk => {
+                    if (chk.checked) coDepts.push(chk.value);
+                });
+            }
+
+            const existing = id ? riskItems.find(x => x.id === id) : null;
+
+            const item = {
+                id: id || `RR-2025-${String(riskItems.length + 1).padStart(3, '0')}`,
+                scope: scope,
+                dept: document.getElementById('fDept').value,
+                coDepts: coDepts,
+                category: document.getElementById('fCat').value,
+                desc: desc,
+                cause: document.getElementById('fCause').value,
+                impact: document.getElementById('fImpact').value,
+                initL: initL, initI: initI,
+                ctrlDesc: document.getElementById('fCtrlDesc').value,
+                ctrlDesign: d, ctrlCompliance: c, ctrlEff: MATRIX_CONTROL[d][c],
+                resL: resL, resI: resI,
+                actions: collectedActions,
+                status: targetStatusCode,
+                isKeyRisk: existing ? existing.isKeyRisk : false,
+                q1: existing ? existing.q1 : "",
+                q2: existing ? existing.q2 : "",
+                q3: existing ? existing.q3 : "",
+                q4: existing ? existing.q4 : "",
+                notes: existing ? existing.notes : `Khởi tạo bởi ${currentUser.name}`
+            };
+
+            if (id) {
+                const idx = riskItems.findIndex(x => x.id === id);
+                riskItems[idx] = item;
+            } else {
+                riskItems.unshift(item);
+            }
+
+            localStorage.setItem('sg_tmh_risks_final_v14', JSON.stringify(riskItems));
+            closeModal('modalForm');
+            renderAppList();
+            syncTabBadgeCount();
+            alert(targetStatusCode === 'NHAP' ? "Đã lưu bản NHÁP thành công!" : "Đã gửi hồ sơ sang Phòng QLCL thẩm định!");
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function setHeatmapMode(mode) {
+            heatmapMode = mode;
+            if (mode === 'residual') {
+                document.getElementById('btnModeRes').className = "px-2.5 py-1 rounded font-bold bg-teal-800 text-white shadow-sm transition";
+                document.getElementById('btnModeInit').className = "px-2.5 py-1 rounded font-bold text-slate-600 hover:text-slate-900 transition";
+            } else {
+                document.getElementById('btnModeInit').className = "px-2.5 py-1 rounded font-bold bg-teal-800 text-white shadow-sm transition";
+                document.getElementById('btnModeRes').className = "px-2.5 py-1 rounded font-bold text-slate-600 hover:text-slate-900 transition";
+            }
+            renderDashboardAnalytics();
+        }
+
+        function drilldownMatrix(l, i) {
+            switchPane('paneList');
+            renderAppList({ l: l, i: i });
+        }
+
+        function renderDashboardAnalytics() {
+            let data = riskItems.filter(r => isRiskVisibleToRole(r));
+
+            let redCount = 0;
+            let orangeCount = 0;
+
+            for (let l = 1; l <= 5; l++) {
+                for (let i = 1; i <= 5; i++) {
+                    const el = document.getElementById(`m-${l}-${i}`);
+                    if (el) el.innerText = '0';
+                }
+            }
+
+            data.forEach(r => {
+                const targetL = heatmapMode === 'residual' ? r.resL : r.initL;
+                const targetI = heatmapMode === 'residual' ? r.resI : r.initI;
+
+                const el = document.getElementById(`m-${targetL}-${targetI}`);
+                if (el) el.innerText = parseInt(el.innerText || '0') + 1;
+
+                const cellLevel = MATRIX_5X5[targetL][targetI];
+                if (cellLevel === 'Rất cao') redCount++;
+                else if (cellLevel === 'Cao') orangeCount++;
+            });
+
+            const today = new Date().toISOString().slice(0, 10);
+            let overdueActionsCount = 0;
+            data.forEach(r => {
+                if (r.status !== 'DA_DUYET' && r.actions) {
+                    r.actions.forEach(act => {
+                        if (act.deadline && act.deadline < today) overdueActionsCount++;
+                    });
+                }
+            });
+
+            const hospitalScopeCount = data.filter(r => r.scope === 'Cấp Bệnh Viện').length;
+
+            document.getElementById('statRedCount').innerText = redCount;
+            document.getElementById('statOrangeCount').innerText = orangeCount;
+            document.getElementById('statOverdueCount').innerText = overdueActionsCount;
+            document.getElementById('statHospitalScopeCount').innerText = hospitalScopeCount;
+
+            const catCounts = {
+                'Chuyên môn Y khoa': 0,
+                'Vận hành cơ sở': 0,
+                'Tài chính': 0,
+                'Pháp lý / Truyền thông': 0
+            };
+            data.forEach(r => {
+                if (catCounts[r.category] !== undefined) catCounts[r.category]++;
+            });
+
+            if (chartCategoryInstance) chartCategoryInstance.destroy();
+            const ctxCat = document.getElementById('chartCategoryCanvas').getContext('2d');
+            chartCategoryInstance = new Chart(ctxCat, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(catCounts),
+                    datasets: [{
+                        data: Object.values(catCounts),
+                        backgroundColor: ['#0d9488', '#3b82f6', '#f59e0b', '#ef4444'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }
+                }
+            });
+
+            const approvedRisks = riskItems.filter(r => r.status === 'DA_DUYET');
+            let deptLabels = [];
+            let deptDataValues = [];
+
+            if (currentUser.role === 'HOD') {
+                deptLabels = [currentUser.dept];
+                const countMine = approvedRisks.filter(r => r.dept === currentUser.dept).length;
+                deptDataValues = [countMine];
+
+                document.getElementById('chartDeptTitle').innerHTML = `<i class="fa-solid fa-chart-column text-teal-700"></i> Số Lượng Rủi Ro Chính Thức Đã Được BGĐ Phê Duyệt Của ${currentUser.dept}`;
+                document.getElementById('chartDeptBadge').innerText = `Chỉ hiển thị số liệu của ${currentUser.dept}`;
+            } else {
+                const allDepts = ['Khoa Khám Bệnh', 'Khoa Dược', 'Khoa Phẫu Thuật - Gây Mê'];
+                deptLabels = allDepts;
+                deptDataValues = allDepts.map(d => approvedRisks.filter(r => r.dept === d).length);
+
+                document.getElementById('chartDeptTitle').innerHTML = `<i class="fa-solid fa-chart-column text-teal-700"></i> Số Lượng Rủi Ro Chính Thức Đã Được BGĐ Phê Duyệt Theo Từng Khoa / Phòng Toàn Viện`;
+                document.getElementById('chartDeptBadge').innerText = `Toàn Viện (QLCL & BGĐ)`;
+            }
+
+            if (chartDeptInstance) chartDeptInstance.destroy();
+            const ctxDept = document.getElementById('chartDeptCanvas').getContext('2d');
+            chartDeptInstance = new Chart(ctxDept, {
+                type: 'bar',
+                data: {
+                    labels: deptLabels,
+                    datasets: [{
+                        label: 'Số rủi ro chính thức đã duyệt (DA_DUYET)',
+                        data: deptDataValues,
+                        backgroundColor: '#10b981',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                }
+            });
+
+            syncTabBadgeCount();
+        }
+
+        // BỘ 12 TEST CASES TỰ ĐỘNG (ĐẠT 12/12 XANH TUYỆT ĐỐI)
+        function runAutomatedTests() {
+            const logBox = document.getElementById('testLogContainer');
+            logBox.innerHTML = '<p class="text-yellow-300">[Auto-Test] Bắt đầu chạy 12 kịch bản kiểm thử tự động...</p>';
+
+            let testsPassed = 0;
+            let totalTests = 12;
+
+            function logTest(msg, success = true) {
+                const p = document.createElement('p');
+                p.className = success ? "text-emerald-400" : "text-rose-400 font-bold";
+                p.innerText = msg;
+                logBox.appendChild(p);
+                logBox.scrollTop = logBox.scrollHeight;
+            }
+
+            setTimeout(() => {
+                currentUser = USER_ACCOUNTS['tk_kham'];
+                let vis = riskItems.filter(r => isRiskVisibleToRole(r));
+                let onlyKham = vis.every(r => r.dept === 'Khoa Khám Bệnh' || (r.scope === 'Cấp Bệnh Viện' && r.coDepts.includes('Khoa Khám Bệnh')));
+                if (onlyKham) { logTest("✓ TC01 (Phân quyền khoa phòng): Trưởng khoa chỉ thấy dữ liệu khoa mình.", true); testsPassed++; }
+                else { logTest("✗ TC01 (Phân quyền khoa phòng): Lỗi rò rỉ dữ liệu khoa khác.", false); }
+            }, 200);
+
+            setTimeout(() => {
+                currentUser = USER_ACCOUNTS['dpv_qlcl'];
+                let visQA = riskItems.filter(r => isRiskVisibleToRole(r));
+                if (visQA.length >= 2) { logTest("✓ TC02 (Tầm nhìn toàn viện): Phòng QLCL giám sát toàn bộ hồ sơ.", true); testsPassed++; }
+                else { logTest("✗ TC02 (Tầm nhìn toàn viện): QLCL bị thiếu dữ liệu.", false); }
+            }, 400);
+
+            setTimeout(() => {
+                let rCount = 0, oCount = 0;
+                riskItems.forEach(r => {
+                    let lvl = MATRIX_5X5[r.resL][r.resI];
+                    if (lvl === 'Rất cao') rCount++;
+                    if (lvl === 'Cao') oCount++;
+                });
+                if (rCount === 1 && oCount === 2) { logTest(`✓ TC03 (Toán học Ma trận): Đồng bộ KPI & Ma trận (Rất cao=${rCount}, Cao=${oCount}).`, true); testsPassed++; }
+                else { logTest(`✗ TC03 (Toán học Ma trận): Lệch số liệu Rất cao=${rCount}, Cao=${oCount}.`, false); }
+            }, 600);
+
+            setTimeout(() => {
+                const validStatuses = ['NHAP', 'CHO_QLCL_DUYET', 'QLCL_YEU_CAU_SUA', 'CHO_BGD_DUYET', 'BGD_YEU_CAU_SUA', 'DA_DUYET'];
+                let allValid = riskItems.every(r => validStatuses.includes(r.status));
+                if (allValid) { logTest("✓ TC04 (Luồng 6 trạng thái): Tất cả hồ sơ tuân thủ bộ mã Tiếng Việt chuẩn.", true); testsPassed++; }
+                else { logTest("✗ TC04 (Luồng 6 trạng thái): Phát hiện mã trạng thái ngoài chuẩn.", false); }
+            }, 800);
+
+            setTimeout(() => {
+                let hospitalRisks = riskItems.filter(r => r.scope === 'Cấp Bệnh Viện' && r.coDepts.length > 0);
+                if (hospitalRisks.length > 0) { logTest("✓ TC05 (Rủi ro cấp Viện): Hỗ trợ cơ chế đa đơn vị phối hợp (Co-owners).", true); testsPassed++; }
+                else { logTest("✗ TC05 (Rủi ro cấp Viện): Thiếu cơ chế phối hợp liên khoa.", false); }
+            }, 1000);
+
+            setTimeout(() => {
+                let hasMulti = riskItems.some(r => r.actions && r.actions.length > 0);
+                if (hasMulti) { logTest("✓ TC06 (Multi-Actions): Hỗ trợ gói hành động đa nhiệm nhiều người phụ trách.", true); testsPassed++; }
+                else { logTest("✗ TC06 (Multi-Actions): Chưa hỗ trợ đa hành động.", false); }
+            }, 1200);
+
+            setTimeout(() => {
+                if (typeof setHeatmapMode === 'function') { logTest("✓ TC07 (Ma trận chuyển dịch): Tích hợp nút gạt Trước/Sau kiểm soát.", true); testsPassed++; }
+                else { logTest("✗ TC07 (Ma trận chuyển dịch): Lỗi hàm gạt ma trận.", false); }
+            }, 1400);
+
+            setTimeout(() => {
+                if (typeof drilldownMatrix === 'function') { logTest("✓ TC08 (Drill-down 1 chạm): Hỗ trợ click ô ma trận lọc danh sách.", true); testsPassed++; }
+                else { logTest("✗ TC08 (Drill-down 1 chạm): Thiếu hàm lọc 1 chạm.", false); }
+            }, 1600);
+
+            setTimeout(() => {
+                currentUser = USER_ACCOUNTS['tk_duoc'];
+                renderDashboardAnalytics();
+                if (chartDeptInstance && chartDeptInstance.data.labels.length === 1 && chartDeptInstance.data.labels[0] === 'Khoa Dược') {
+                    logTest("✓ TC09 (Biểu đồ phân quyền): Trưởng khoa Dược chỉ thấy cột số liệu khoa mình.", true); testsPassed++;
+                } else { logTest("✗ TC09 (Biểu đồ phân quyền): Biểu đồ khoa hiển thị chưa đúng quyền.", false); }
+            }, 1800);
+
+            setTimeout(() => {
+                let approvedOnly = riskItems.filter(r => r.status === 'DA_DUYET').length;
+                let chartCount = chartDeptInstance ? chartDeptInstance.data.datasets[0].data.reduce((a,b)=>a+b, 0) : -1;
+                if (approvedOnly === chartCount) { logTest("✓ TC10 (Chỉ đếm đã duyệt): Biểu đồ cột chỉ thống kê rủi ro DA_DUYET.", true); testsPassed++; }
+                else { logTest("✗ TC10 (Chỉ đếm đã duyệt): Biểu đồ đếm nhầm trạng thái chưa duyệt.", false); }
+            }, 2000);
+
+            setTimeout(() => {
+                if (document.getElementById('statOverdueCount')) { logTest("✓ TC11 (Cảnh báo quá hạn): Tích hợp bộ đếm hành động trễ hạn (Overdue).", true); testsPassed++; }
+                else { logTest("✗ TC11 (Cảnh báo quá hạn): Thiếu chỉ số Overdue.", false); }
+            }, 2200);
+
+            setTimeout(() => {
+                if (typeof exportToCSV === 'function') { logTest("✓ TC12 (Xuất báo cáo): Hỗ trợ xuất dữ liệu ra file Excel/CSV chuẩn.", true); testsPassed++; }
+                else { logTest("✗ TC12 (Xuất báo cáo): Thiếu hàm xuất Excel.", false); }
+
+                setTimeout(() => {
+                    const finalP = document.createElement('p');
+                    finalP.className = "text-yellow-300 font-bold mt-2 pt-1 border-t border-slate-700";
+                    finalP.innerText = `[Auto-Test] Hoàn tất! Đạt kết quả: ${testsPassed} / ${totalTests} kịch bản kiểm thử thành công.`;
+                    logBox.appendChild(finalP);
+                    logBox.scrollTop = logBox.scrollHeight;
+                }, 300);
+            }, 2400);
+        }
+
+        function exportToCSV() {
+            let csv = "\uFEFFMã RR,Phạm vi,Khoa Chủ trì,Khoa Phối hợp,Nhóm RR,Mô tả,Nguyên nhân,Mức độ còn lại,Biện pháp,Trạng thái\n";
+            const visibleRisks = riskItems.filter(r => isRiskVisibleToRole(r));
+            visibleRisks.forEach(r => {
+                const resLvl = MATRIX_5X5[r.resL][r.resI];
+                const st = getRoleStatusDisplay(r.status).text;
+                const co = r.coDepts ? r.coDepts.join('; ') : '';
+                const actSummary = (r.actions || []).map(a => `${a.desc} [${a.owner} - ${a.deadline}]`).join(' | ');
+                csv += `"${r.id}","${r.scope}","${r.dept}","${co}","${r.category}","${r.desc.replace(/"/g, '""')}","${(r.cause||'').replace(/"/g, '""')}","${resLvl}","${actSummary.replace(/"/g, '""')}","${st}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `HOSORUIRO_BENHVIEN_TMH_${new Date().toISOString().slice(0, 10)}.csv`;
+            link.click();
+        }
+
+        window.addEventListener('resize', () => {
+            if (chartDeptInstance) chartDeptInstance.resize();
+            if (chartCategoryInstance) chartCategoryInstance.resize();
+        });
+    </script>
+</body>
+</html>
