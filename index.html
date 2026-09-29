@@ -156,9 +156,6 @@
                         <select id="filterScopeSelect" onchange="renderAppList()" class="text-xs border border-slate-300 rounded-lg p-2 bg-white focus:outline-teal-600"><option value="">-- Tất cả phạm vi --</option><option value="Cấp Khoa/Phòng">Cấp Khoa/Phòng</option><option value="Cấp Bệnh Viện">Cấp Bệnh Viện</option></select>
                         <select id="filterStatusSelect" onchange="renderAppList()" class="text-xs border border-slate-300 rounded-lg p-2 bg-white focus:outline-teal-600"></select>
                     </div>
-                    <div class="flex justify-end items-center gap-2">
-                        <button onclick="exportToCSV()" class="w-full md:w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-lg border border-slate-300 flex items-center justify-center gap-1.5 shrink-0"><i class="fa-solid fa-file-excel text-emerald-600"></i> Xuất Excel</button>
-                    </div>
                 </div>
 
                 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
@@ -166,7 +163,7 @@
                         <thead>
                             <tr class="bg-slate-100/90 text-slate-700 font-bold uppercase tracking-wider border-b border-slate-200">
                                 <th class="p-3 text-center w-24">Mã RR</th>
-                                <th class="p-3 w-40">Khoa Chủ Trì</th>
+                                <th class="p-3 w-44">Khoa Chủ Trì & Phối Hợp</th>
                                 <th class="p-3">Mô Tả Rủi Ro & Nguyên Nhân</th>
                                 <th class="p-3 text-center w-32">Mức Độ Còn Lại</th>
                                 <th class="p-3 w-56">Tiến độ Hành Động</th>
@@ -186,11 +183,10 @@
                 <!-- BỘ LỌC TOÀN CỤC DASHBOARD -->
                 <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-wrap gap-2.5 items-center">
                     <span class="font-bold text-slate-700 text-xs mr-2"><i class="fa-solid fa-filter text-teal-600"></i> Lọc Báo Cáo:</span>
-                    <!-- BỘ LỌC NĂM MỚI BỔ SUNG -->
                     <select id="dbFilterYear" onchange="renderDashboardAnalytics()" class="text-xs border border-slate-300 rounded-lg p-1.5 bg-slate-50 focus:outline-teal-600 font-bold text-teal-900">
-                        <option value="">Tất cả các Năm</option><option value="2025">Năm 2025</option><option value="2026" selected>Năm 2026</option><option value="2027">Năm 2027</option>
+                        <option value="">Tất cả Năm</option><option value="2025">Năm 2025</option><option value="2026" selected>Năm 2026</option><option value="2027">Năm 2027</option>
                     </select>
-                    <select id="dbFilterQuarter" onchange="renderDashboardAnalytics()" class="text-xs border border-slate-300 rounded-lg p-1.5 bg-slate-50 focus:outline-teal-600"><option value="">Tất cả các Quý</option><option value="Q1">Quý 1</option><option value="Q2">Quý 2</option><option value="Q3">Quý 3</option><option value="Q4">Quý 4</option></select>
+                    <select id="dbFilterQuarter" onchange="renderDashboardAnalytics()" class="text-xs border border-slate-300 rounded-lg p-1.5 bg-slate-50 focus:outline-teal-600"><option value="">Tất cả Quý</option><option value="Q1">Quý 1</option><option value="Q2">Quý 2</option><option value="Q3">Quý 3</option><option value="Q4">Quý 4</option></select>
                     <select id="dbFilterDept" onchange="renderDashboardAnalytics()" class="text-xs border border-slate-300 rounded-lg p-1.5 bg-slate-50 focus:outline-teal-600"><option value="">Tất cả Khoa/Phòng</option><option value="Khoa Khám Bệnh">Khoa Khám Bệnh</option><option value="Khoa Dược">Khoa Dược</option><option value="Khoa Phẫu Thuật - Gây Mê">Khoa Phẫu Thuật</option></select>
                     <select id="dbFilterCat" onchange="renderDashboardAnalytics()" class="text-xs border border-slate-300 rounded-lg p-1.5 bg-slate-50 focus:outline-teal-600"><option value="">Tất cả Nhóm Rủi Ro</option><option value="Chuyên môn Y khoa">Chuyên môn Y khoa</option><option value="Vận hành cơ sở">Vận hành cơ sở</option><option value="Tài chính">Tài chính</option><option value="Pháp lý / Truyền thông">Pháp lý / Truyền thông</option></select>
                     <select id="dbFilterStatus" onchange="renderDashboardAnalytics()" class="text-xs border border-slate-300 rounded-lg p-1.5 bg-slate-50 focus:outline-teal-600"><option value="">Tất cả Trạng Thái</option><option value="DA_DUYET">Đã duyệt (Lưu viện)</option><option value="CHO_BGD_DUYET">Chờ BGĐ Duyệt</option><option value="CHO_QLCL_DUYET">Chờ QLCL Thẩm định</option></select>
@@ -204,31 +200,30 @@
                     </div>
                 </div>
 
-                <!-- 6 THẺ CHỈ SỐ TRỌNG YẾU (ALL CLICKABLE) -->
                 <div class="grid grid-cols-2 lg:grid-cols-6 gap-3 text-xs">
                     <div onclick="openHotzoneModal('total')" class="bg-white p-3.5 rounded-xl border border-slate-300 cursor-pointer hover:bg-slate-50 transition shadow-sm group">
                         <span class="text-slate-500 font-bold block text-[11px] uppercase flex justify-between">Tổng Số Rủi Ro <i class="fa-solid fa-layer-group text-slate-400 group-hover:scale-110"></i></span>
                         <span id="statTotalCount" class="text-2xl font-black text-slate-800 mt-1 block">0</span>
                     </div>
-                    <div onclick="openHotzoneModal('effective')" class="bg-white p-3.5 rounded-xl border border-slate-300 cursor-pointer hover:bg-emerald-50 transition shadow-sm group" title="Chỉ tính trên những hồ sơ Đã Duyệt">
-                        <span class="text-slate-500 font-bold block text-[11px] uppercase flex justify-between">% KS Hiệu quả <i class="fa-solid fa-shield-check text-emerald-500 group-hover:scale-110"></i></span>
-                        <span id="statEffPercent" class="text-2xl font-black text-emerald-600 mt-1 block">0%</span>
-                    </div>
-                    <div onclick="openHotzoneModal('red')" class="bg-red-50 p-3.5 rounded-xl border border-red-200 cursor-pointer hover:bg-red-100 transition shadow-sm group">
-                        <span class="text-red-900 font-bold block text-[11px] uppercase flex justify-between">Rất Cao (Đỏ) <i class="fa-solid fa-fire text-red-500 group-hover:scale-110"></i></span>
-                        <span id="statRedCount" class="text-2xl font-black text-red-600 mt-1 block">0</span>
-                    </div>
-                    <div onclick="openHotzoneModal('orange')" class="bg-orange-50 p-3.5 rounded-xl border border-orange-200 cursor-pointer hover:bg-orange-100 transition shadow-sm group">
-                        <span class="text-orange-900 font-bold block text-[11px] uppercase flex justify-between">Cao (Cam) <i class="fa-solid fa-triangle-exclamation text-orange-500 group-hover:scale-110"></i></span>
-                        <span id="statOrangeCount" class="text-2xl font-black text-orange-600 mt-1 block">0</span>
-                    </div>
-                    <div onclick="openHotzoneModal('overdue')" class="bg-rose-50 p-3.5 rounded-xl border border-rose-200 cursor-pointer hover:bg-rose-100 transition shadow-sm group" title="Chỉ tính trên những hồ sơ Đã Duyệt">
-                        <span class="text-rose-900 font-bold block text-[11px] uppercase flex justify-between">HĐ Quá hạn <i class="fa-solid fa-clock text-rose-500 group-hover:scale-110"></i></span>
-                        <span id="statOverdueCount" class="text-2xl font-black text-rose-700 mt-1 block">0</span>
-                    </div>
                     <div onclick="openHotzoneModal('hospital')" class="bg-teal-50 p-3.5 rounded-xl border border-teal-200 cursor-pointer hover:bg-teal-100 transition shadow-sm group">
                         <span class="text-teal-900 font-bold block text-[11px] uppercase flex justify-between">Cấp Bệnh Viện <i class="fa-solid fa-hospital text-teal-600 group-hover:scale-110"></i></span>
                         <span id="statHospitalScopeCount" class="text-2xl font-black text-teal-800 mt-1 block">0</span>
+                    </div>
+                    <div onclick="openHotzoneModal('red')" class="bg-red-50 p-3.5 rounded-xl border border-red-200 cursor-pointer hover:bg-red-100 transition shadow-sm group">
+                        <span class="text-red-900 font-bold block text-[11px] uppercase flex justify-between">Rủi ro Rất cao <i class="fa-solid fa-fire text-red-500 group-hover:scale-110"></i></span>
+                        <span id="statRedCount" class="text-2xl font-black text-red-600 mt-1 block">0</span>
+                    </div>
+                    <div onclick="openHotzoneModal('orange')" class="bg-orange-50 p-3.5 rounded-xl border border-orange-200 cursor-pointer hover:bg-orange-100 transition shadow-sm group">
+                        <span class="text-orange-900 font-bold block text-[11px] uppercase flex justify-between">Rủi ro Cao <i class="fa-solid fa-triangle-exclamation text-orange-500 group-hover:scale-110"></i></span>
+                        <span id="statOrangeCount" class="text-2xl font-black text-orange-600 mt-1 block">0</span>
+                    </div>
+                    <div onclick="openHotzoneModal('effective')" class="bg-white p-3.5 rounded-xl border border-slate-300 cursor-pointer hover:bg-emerald-50 transition shadow-sm group" title="Chỉ tính trên những hồ sơ Đã Duyệt">
+                        <span class="text-slate-500 font-bold block text-[11px] uppercase flex justify-between">% Kiểm soát Hiệu quả <i class="fa-solid fa-shield-check text-emerald-500 group-hover:scale-110"></i></span>
+                        <span id="statEffPercent" class="text-2xl font-black text-emerald-600 mt-1 block">0%</span>
+                    </div>
+                    <div onclick="openHotzoneModal('overdue')" class="bg-rose-50 p-3.5 rounded-xl border border-rose-200 cursor-pointer hover:bg-rose-100 transition shadow-sm group" title="Chỉ tính trên những hồ sơ Đã Duyệt">
+                        <span class="text-rose-900 font-bold block text-[11px] uppercase flex justify-between">Hành động quá hạn <i class="fa-solid fa-clock text-rose-500 group-hover:scale-110"></i></span>
+                        <span id="statOverdueCount" class="text-2xl font-black text-rose-700 mt-1 block">0</span>
                     </div>
                 </div>
 
@@ -240,7 +235,6 @@
                     </div>
                     <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
                         <h3 class="text-xs font-bold text-slate-800 uppercase mb-2 text-center"><i class="fa-solid fa-chart-pie text-teal-700 mr-1.5"></i> Cơ Cấu 4 Nhóm Rủi Ro</h3>
-                        <!-- ID ĐÃ ĐƯỢC SỬA CHÍNH XÁC: chartCategoryDoughnut -->
                         <div class="h-48 relative flex-1 w-full"><canvas id="chartCategoryDoughnut"></canvas></div>
                     </div>
                 </div>
@@ -259,7 +253,9 @@
                         </div>
                         <div class="overflow-x-auto pb-1">
                             <div class="min-w-[340px] grid grid-cols-6 gap-1 text-center text-[10px] sm:text-xs font-bold">
-                                <div class="p-1 text-slate-400 self-center">L \ I</div><div class="p-1 bg-slate-100 rounded text-slate-600">1. Không</div><div class="p-1 bg-slate-100 rounded text-slate-600">2. Nhỏ</div><div class="p-1 bg-slate-100 rounded text-slate-600">3. TB</div><div class="p-1 bg-slate-100 rounded text-slate-600">4. Lớn</div><div class="p-1 bg-slate-100 rounded text-slate-600">5. Rất lớn</div>
+                                <div class="p-1 text-teal-800 self-center font-black text-[9px] leading-tight bg-teal-50 rounded">Khả năng (L)<br>\<br>Mức độ (I)</div>
+                                <div class="p-1 bg-slate-100 rounded text-slate-600">1. Không</div><div class="p-1 bg-slate-100 rounded text-slate-600">2. Nhỏ</div><div class="p-1 bg-slate-100 rounded text-slate-600">3. TB</div><div class="p-1 bg-slate-100 rounded text-slate-600">4. Lớn</div><div class="p-1 bg-slate-100 rounded text-slate-600">5. Rất lớn</div>
+                                
                                 <div class="p-1 bg-slate-100 rounded text-slate-600 flex items-center justify-center">5. Chắc chắn</div>
                                 <div id="m-5-1" onclick="drilldownMatrix(5, 1)" class="p-1.5 sm:p-2 rounded badge-medium cursor-pointer hover:opacity-80">0</div><div id="m-5-2" onclick="drilldownMatrix(5, 2)" class="p-1.5 sm:p-2 rounded badge-high cursor-pointer hover:opacity-80">0</div><div id="m-5-3" onclick="drilldownMatrix(5, 3)" class="p-1.5 sm:p-2 rounded badge-high cursor-pointer hover:opacity-80">0</div><div id="m-5-4" onclick="drilldownMatrix(5, 4)" class="p-1.5 sm:p-2 rounded badge-extreme cursor-pointer hover:opacity-80">0</div><div id="m-5-5" onclick="drilldownMatrix(5, 5)" class="p-1.5 sm:p-2 rounded badge-extreme cursor-pointer hover:opacity-80">0</div>
                                 <div class="p-1 bg-slate-100 rounded text-slate-600 flex items-center justify-center">4. Rất dễ</div>
@@ -284,7 +280,6 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
                         <h3 class="text-xs font-bold text-slate-800 uppercase mb-2"><i class="fa-solid fa-chart-column text-teal-700 mr-1.5"></i> RR Theo Khoa/Phòng (Tổng vs Đã duyệt)</h3>
-                        <!-- ID ĐÃ ĐƯỢC SỬA CHÍNH XÁC: chartDeptGrouped -->
                         <div class="h-56 relative w-full flex-1"><canvas id="chartDeptGrouped"></canvas></div>
                     </div>
                     <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
@@ -296,10 +291,10 @@
                 <!-- TẦNG 6: BẢNG TOP RISKS -->
                 <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                     <h3 class="text-xs font-bold text-red-800 uppercase mb-3"><i class="fa-solid fa-star text-red-600 mr-1.5"></i> Danh Sách Rủi Ro Trọng Điểm (Mức Đỏ/Cam + Có gắn cờ UBRR)</h3>
-                    <div class="overflow-x-auto rounded-lg border border-slate-200">
+                    <div class="overflow-y-auto max-h-64 rounded-lg border border-slate-200">
                         <table class="w-full text-left text-xs border-collapse">
-                            <thead class="bg-slate-100 text-slate-700 border-b border-slate-200">
-                                <tr><th class="p-2.5 font-bold w-32">Mã RR</th><th class="p-2.5 font-bold w-40">Khoa</th><th class="p-2.5 font-bold">Nội dung rủi ro</th><th class="p-2.5 text-center font-bold w-28">Mức độ</th><th class="p-2.5 text-center font-bold w-32">Trạng thái</th></tr>
+                            <thead class="bg-slate-100 text-slate-700 border-b border-slate-200 sticky top-0 shadow-sm z-10">
+                                <tr><th class="p-2.5 font-bold w-32">Mã RR</th><th class="p-2.5 font-bold w-44">Khoa Chủ Trì & Phối Hợp</th><th class="p-2.5 font-bold">Mô Tả Rủi Ro & Nguyên Nhân</th><th class="p-2.5 text-center font-bold w-28">Mức độ</th><th class="p-2.5 text-center font-bold w-32">Trạng thái</th></tr>
                             </thead>
                             <tbody id="topRisksTableBody" class="divide-y divide-slate-100"></tbody>
                         </table>
@@ -349,10 +344,13 @@
                 <button onclick="closeModal('modalDetail')" class="text-slate-400 hover:text-slate-700 text-3xl font-bold leading-none">&times;</button>
             </div>
             <div class="p-4 sm:p-6 overflow-y-auto flex-1 space-y-5 text-xs bg-slate-50/50">
-                <div id="dtCoDeptsBox" class="hidden bg-amber-50/70 p-3 rounded-xl border border-amber-200 text-[11px]">
-                    <span class="font-bold text-amber-950 block mb-0.5"><i class="fa-solid fa-handshake-angle mr-1"></i> Đơn vị phối hợp:</span>
-                    <p id="dtCoDeptsText" class="text-amber-900 font-medium"></p>
+                
+                <!-- KHỐI ĐƠN VỊ PHỐI HỢP THỰC HIỆN CẬP NHẬT MỚI -->
+                <div id="dtCoDeptsBox" class="hidden bg-[#fff8eb] p-4 rounded-xl border border-amber-200 shadow-sm">
+                    <span class="font-bold text-amber-900 text-xs block mb-1.5"><i class="fa-solid fa-handshake-angle mr-1.5"></i> Đơn vị phối hợp thực hiện:</span>
+                    <p id="dtCoDeptsText" class="text-amber-800 text-xs font-medium"></p>
                 </div>
+
                 <!-- 2 Cột Nguyên nhân / Hậu quả -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                     <div>
@@ -485,11 +483,11 @@
         </div>
     </div>
 
-    <!-- ================= POPUP NHẬP FORM RỦI RO ================= -->
+    <!-- ================= POPUP NHẬP FORM RỦI RO (ĐÃ THIẾT KẾ LẠI THEO UI MỚI) ================= -->
     <div id="modalForm" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center z-50 p-2 sm:p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden">
             <div class="p-4 border-b flex justify-between items-center shrink-0 bg-slate-50">
-                <h3 id="formTitle" class="text-sm sm:text-base font-bold text-slate-800">Nhập Hồ Sơ Quản Lý Rủi Ro Mới</h3>
+                <h3 id="formTitle" class="text-sm sm:text-base font-bold text-teal-900 uppercase tracking-wide">Nhập Hồ Sơ Quản Lý Rủi Ro Mới</h3>
                 <button onclick="closeModal('modalForm')" class="text-slate-400 hover:text-slate-700 text-2xl font-bold leading-none">&times;</button>
             </div>
             <form id="formRiskInput" class="p-5 overflow-y-auto flex-1 space-y-4 text-xs">
@@ -527,55 +525,101 @@
                         </div>
                     </div>
                 </div>
+                
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Mô tả sự kiện rủi ro <span class="text-red-500">*</span></label>
-                    <textarea id="fDesc" required rows="2" class="w-full border border-slate-300 rounded-lg p-2 focus:outline-teal-600"></textarea>
+                    <label class="block font-bold text-slate-700 mb-1">Mô tả sự kiện rủi ro <span class="text-red-500">*</span></label>
+                    <textarea id="fDesc" required rows="2" placeholder="Mô tả tóm tắt sự kiện rủi ro..." class="w-full border border-slate-300 rounded-lg p-2 focus:outline-teal-600"></textarea>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div><label class="block font-semibold text-slate-700 mb-1">Nguyên nhân gốc rễ (Root Cause)</label><textarea id="fCause" rows="2" class="w-full border border-slate-300 rounded-lg p-2 focus:outline-teal-600"></textarea></div>
-                    <div><label class="block font-semibold text-slate-700 mb-1">Tác động / Hậu quả dự kiến</label><textarea id="fImpact" rows="2" class="w-full border border-slate-300 rounded-lg p-2 focus:outline-teal-600"></textarea></div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Nguyên nhân gốc rễ (Root Cause)</label>
+                        <textarea id="fCause" rows="2" placeholder="Ví dụ: Gạch men trơn, thiếu ánh sáng, nhân viên quá tải..." class="w-full border border-slate-300 rounded-lg p-2 focus:outline-teal-600 placeholder-slate-400"></textarea>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Tác động / Hậu quả dự kiến</label>
+                        <textarea id="fImpact" rows="2" placeholder="Ví dụ: Chấn thương, rạn xương ở người cao tuổi..." class="w-full border border-slate-300 rounded-lg p-2 focus:outline-teal-600 placeholder-slate-400"></textarea>
+                    </div>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-200">
-                        <span class="font-bold text-blue-950 block mb-2 uppercase tracking-wider text-[11px]">Đánh giá Rủi Ro Ban Đầu (Inherit Risk)</span>
-                        <div class="grid grid-cols-2 gap-3 items-center">
-                            <div><label class="block text-slate-600 mb-1">Khả năng (L)</label><select id="fInitL" onchange="autoCalcModalScores()" class="w-full border border-slate-300 rounded-lg p-1.5 bg-white"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
-                            <div><label class="block text-slate-600 mb-1">Mức độ (I)</label><select id="fInitI" onchange="autoCalcModalScores()" class="w-full border border-slate-300 rounded-lg p-1.5 bg-white"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
-                            <div class="col-span-2 text-center pt-2"><span id="fInitBadge" class="px-4 py-1.5 rounded-lg font-bold border inline-block text-xs badge-low">Thấp</span></div>
+                <!-- BLOCK 1: INHERIT RISK -->
+                <div class="bg-blue-50/40 p-5 rounded-xl border border-blue-200 shadow-sm mt-2">
+                    <span class="font-bold text-blue-950 block mb-4 uppercase tracking-wider text-[11px]">ĐÁNH GIÁ RỦI RO BAN ĐẦU (INHERIT RISK)</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 items-end">
+                        <div>
+                            <label class="block text-slate-600 font-semibold mb-1">Khả năng xảy ra (L)</label>
+                            <select id="fInitL" onchange="autoCalcModalScores()" class="w-full border border-slate-300 rounded-lg p-2 bg-white focus:outline-blue-500">
+                                <option value="1">1 - Hiếm khi xảy ra</option><option value="2">2 - Ít khả năng</option><option value="3">3 - Có thể</option><option value="4">4 - Rất dễ</option><option value="5">5 - Chắc chắn</option>
+                            </select>
                         </div>
-                    </div>
-                    <div class="bg-amber-50/50 p-4 rounded-xl border border-amber-200">
-                        <span class="font-bold text-amber-950 block mb-2 uppercase tracking-wider text-[11px]">Rủi Ro Còn Lại (Residual Risk)</span>
-                        <div class="grid grid-cols-2 gap-3 items-center">
-                            <div><label class="block text-slate-600 mb-1">L còn lại</label><select id="fResL" onchange="autoCalcModalScores()" class="w-full border border-slate-300 rounded-lg p-1.5 bg-white"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
-                            <div><label class="block text-slate-600 mb-1">I còn lại</label><select id="fResI" onchange="autoCalcModalScores()" class="w-full border border-slate-300 rounded-lg p-1.5 bg-white"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
-                            <div class="col-span-2 text-center pt-2"><span id="fResBadge" class="px-4 py-1.5 rounded-lg font-bold border inline-block text-xs badge-low">Thấp</span></div>
+                        <div>
+                            <label class="block text-slate-600 font-semibold mb-1">Mức độ ảnh hưởng (I)</label>
+                            <select id="fInitI" onchange="autoCalcModalScores()" class="w-full border border-slate-300 rounded-lg p-2 bg-white focus:outline-blue-500">
+                                <option value="1">1 - Không đáng kể</option><option value="2">2 - Nhỏ</option><option value="3">3 - Trung bình</option><option value="4">4 - Lớn</option><option value="5">5 - Nghiêm trọng</option>
+                            </select>
+                        </div>
+                        <div class="text-right sm:text-center pb-1">
+                            <span class="block text-slate-600 font-bold mb-1.5">Xếp hạng ban đầu:</span>
+                            <span id="fInitBadge" class="px-4 py-1.5 rounded-lg font-bold border text-sm badge-low">Thấp</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                    <span class="font-bold text-slate-800 block uppercase tracking-wider text-[11px] mb-2">Đánh giá Kiểm Soát Hiện Tại</span>
-                    <input type="text" id="fCtrlDesc" placeholder="Mô tả kiểm soát hiện tại..." class="w-full border border-slate-300 rounded-lg p-2 bg-white mb-2">
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
-                        <div><label class="block text-slate-600 mb-1">Thiết kế:</label><select id="fCtrlDesign" onchange="autoCalcModalScores()" class="w-full border border-slate-300 rounded-lg p-1.5 bg-white"><option value="Thiết kế tốt">Thiết kế tốt</option><option value="Thiết kế tương đối hợp lý">Thiết kế tương đối hợp lý</option><option value="Thiết kế thiếu một số kiểm soát chính">Thiết kế thiếu kiểm soát chính</option><option value="Thiết kế thiếu kiểm soát cơ bản">Thiết kế thiếu kiểm soát cơ bản</option></select></div>
-                        <div><label class="block text-slate-600 mb-1">Tuân thủ:</label><select id="fCtrlCompliance" onchange="autoCalcModalScores()" class="w-full border border-slate-300 rounded-lg p-1.5 bg-white"><option value="Tuân thủ tốt">Tuân thủ tốt</option><option value="Tuân thủ tương đối">Tuân thủ tương đối</option><option value="Tuân thủ một phần">Tuân thủ một phần</option><option value="Không tuân thủ">Không tuân thủ</option></select></div>
-                        <div class="text-center"><span class="block text-slate-600 mb-1 font-semibold">Hiệu quả:</span><span id="fCtrlEffBadge" class="px-2.5 py-1 rounded text-xs font-bold eff-good inline-block">Hiệu quả</span></div>
+                <!-- BLOCK 2: CONTROL & RESIDUAL RISK -->
+                <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <span class="font-bold text-slate-800 block uppercase tracking-wider text-[11px] mb-3">KIỂM SOÁT HIỆN TẠI & RỦI RO CÒN LẠI (RESIDUAL RISK)</span>
+                    <input type="text" id="fCtrlDesc" placeholder="Mô tả kiểm soát hiện tại đang áp dụng..." class="w-full border border-slate-300 rounded-lg p-2.5 bg-white mb-4 placeholder-slate-400 focus:outline-slate-500">
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 items-end border-b border-slate-200 pb-4 mb-4">
+                        <div>
+                            <label class="block text-slate-600 font-semibold mb-1">Thiết kế kiểm soát:</label>
+                            <select id="fCtrlDesign" onchange="autoCalcModalScores()" class="w-full border border-slate-300 rounded-lg p-2 bg-white focus:outline-slate-500">
+                                <option value="Thiết kế tốt">Thiết kế tốt</option><option value="Thiết kế tương đối hợp lý">Thiết kế tương đối hợp lý</option><option value="Thiết kế thiếu một số kiểm soát chính">Thiết kế thiếu kiểm soát chính</option><option value="Thiết kế thiếu kiểm soát cơ bản">Thiết kế thiếu kiểm soát cơ bản</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-slate-600 font-semibold mb-1">Tuân thủ kiểm soát:</label>
+                            <select id="fCtrlCompliance" onchange="autoCalcModalScores()" class="w-full border border-slate-300 rounded-lg p-2 bg-white focus:outline-slate-500">
+                                <option value="Tuân thủ tốt">Tuân thủ tốt</option><option value="Tuân thủ tương đối">Tuân thủ tương đối</option><option value="Tuân thủ một phần">Tuân thủ một phần</option><option value="Không tuân thủ">Không tuân thủ</option>
+                            </select>
+                        </div>
+                        <div class="text-right sm:text-center pb-1">
+                            <span class="block text-slate-600 font-bold mb-1.5">Hiệu quả:</span>
+                            <span id="fCtrlEffBadge" class="px-3 py-1.5 rounded-lg text-xs font-bold eff-good inline-block">Hiệu quả</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 items-end">
+                        <div>
+                            <label class="block text-slate-600 font-semibold mb-1">L còn lại (1-5)</label>
+                            <select id="fResL" onchange="autoCalcModalScores()" class="w-full border border-slate-300 rounded-lg p-2 bg-white focus:outline-teal-500">
+                                <option value="1">1 - Hiếm</option><option value="2">2 - Ít khi</option><option value="3">3 - Có thể</option><option value="4">4 - Rất dễ</option><option value="5">5 - Chắc chắn</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-slate-600 font-semibold mb-1">I còn lại (1-5)</label>
+                            <select id="fResI" onchange="autoCalcModalScores()" class="w-full border border-slate-300 rounded-lg p-2 bg-white focus:outline-teal-500">
+                                <option value="1">1 - Không đáng kể</option><option value="2">2 - Nhỏ</option><option value="3">3 - Trung bình</option><option value="4">4 - Lớn</option><option value="5">5 - Rất lớn</option>
+                            </select>
+                        </div>
+                        <div class="text-right sm:text-center pb-1">
+                            <span class="block text-slate-600 font-bold mb-1.5">Mức rủi ro còn lại:</span>
+                            <span id="fResBadge" class="px-4 py-1.5 rounded-lg font-bold border text-sm badge-low">Thấp</span>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="bg-[#f0fdfa] p-4 rounded-xl border border-teal-200 space-y-3">
-                    <div class="flex justify-between items-center">
-                        <span class="font-bold text-teal-950 block text-xs"><i class="fa-solid fa-list-check text-teal-700 mr-1"></i> Kế hoạch hành động can thiệp (Chỉ đếm tiến độ khi hồ sơ ĐÃ DUYỆT):</span>
-                        <button type="button" onclick="addActionInputRow()" class="bg-teal-700 hover:bg-teal-800 text-white font-bold px-3 py-1.5 rounded text-[11px] shadow-sm"><i class="fa-solid fa-plus mr-1"></i> Thêm việc</button>
+                <div class="bg-[#f0fdfa] p-4 rounded-xl border border-teal-200 shadow-sm mt-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="font-bold text-teal-950 block text-xs uppercase tracking-wide"><i class="fa-solid fa-list-check text-teal-700 mr-1.5"></i> Kế hoạch hành động can thiệp <span class="normal-case text-[10px] text-teal-700 font-normal">(Chỉ đếm tiến độ khi hồ sơ ĐÃ DUYỆT)</span>:</span>
+                        <button type="button" onclick="addActionInputRow()" class="bg-teal-700 hover:bg-teal-800 text-white font-bold px-3 py-1.5 rounded text-[11px] shadow-sm transition"><i class="fa-solid fa-plus mr-1"></i> Thêm việc</button>
                     </div>
                     <div id="actionInputsContainer" class="space-y-2"></div>
                 </div>
-                <div class="pt-3 border-t flex justify-end gap-2 shrink-0">
-                    <button type="button" onclick="closeModal('modalForm')" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-semibold">Hủy</button>
-                    <button type="button" onclick="saveRiskRecord('NHAP')" class="px-5 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-bold shadow"><i class="fa-solid fa-floppy-disk mr-1"></i> Lưu Nháp</button>
-                    <button type="button" onclick="saveRiskRecord('CHO_QLCL_DUYET')" class="px-5 py-2 bg-teal-800 hover:bg-teal-900 text-white rounded-lg font-bold shadow"><i class="fa-solid fa-paper-plane mr-1"></i> Gửi QLCL</button>
+
+                <div class="pt-4 mt-2 border-t flex justify-end gap-3 shrink-0">
+                    <button type="button" onclick="closeModal('modalForm')" class="px-6 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-bold transition">Hủy</button>
+                    <button type="button" onclick="saveRiskRecord('NHAP')" class="px-6 py-2.5 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-bold shadow-md transition"><i class="fa-solid fa-floppy-disk mr-1.5"></i> Lưu Nháp</button>
+                    <button type="button" onclick="saveRiskRecord('CHO_QLCL_DUYET')" class="px-6 py-2.5 bg-teal-800 hover:bg-teal-900 text-white rounded-lg font-bold shadow-md transition"><i class="fa-solid fa-paper-plane mr-1.5"></i> Gửi QLCL</button>
                 </div>
             </form>
         </div>
@@ -604,7 +648,7 @@
     <script>
         // KIỂM SOÁT THƯ VIỆN DATALABELS TOÀN CỤC
         Chart.register(ChartDataLabels);
-        Chart.defaults.plugins.datalabels.display = false; // Tắt mặc định cho toàn bộ
+        Chart.defaults.plugins.datalabels.display = false;
 
         const MATRIX_5X5 = {
             5: { 1: 'Trung bình', 2: 'Cao', 3: 'Cao', 4: 'Rất cao', 5: 'Rất cao' },
@@ -629,7 +673,6 @@
             'bgd_giamdoc': { name: 'BS. Hoàng Long', title: 'Ban Giám Đốc', dept: 'Ban Giám Đốc', role: 'BOD', pass: '123' }
         };
 
-        // --- CẬP NHẬT YÊU CẦU: CHỈ TÍNH TIẾN ĐỘ CHO HỒ SƠ ĐÃ DUYỆT ---
         function getActionDynamicStatus(act, riskStatus) {
             if (riskStatus !== 'DA_DUYET') return 'Chờ duyệt';
             if (act.status === 'Đã hoàn thành') return 'Đã hoàn thành';
@@ -650,7 +693,7 @@
         const INITIAL_RISKS = [
             {
                 id: "RR-2026-001", scope: "Cấp Bệnh Viện", dept: "Khoa Khám Bệnh", coDepts: ["Khoa Dược", "Khoa Phẫu Thuật - Gây Mê"], category: "Chuyên môn Y khoa", reportYear: "2026", reportQuarter: "Q1",
-                desc: "Nhận diện sai người bệnh xuyên suốt chuỗi tiếp đón, phát thuốc và phẫu thuật", cause: "Trùng họ tên, bỏ qua đối chiếu kép", impact: "Mổ nhầm vị trí hoặc dùng sai thuốc",
+                desc: "Nhận diện sai người bệnh xuyên suốt chuỗi tiếp đón, phát thuốc và phẫu thuật", cause: "Bệnh nhân trùng họ tên, bác sĩ bỏ qua bước đối chiếu kép trước khi can thiệp.", impact: "Mổ nhầm vị trí hoặc dùng sai thuốc",
                 initL: 3, initI: 5, initLevel: "Rất cao", ctrlDesc: "Hỏi miệng tên", ctrlDesign: "Thiết kế thiếu một số kiểm soát chính", ctrlCompliance: "Tuân thủ tương đối", ctrlEff: "Cần cải thiện đáng kể",
                 resL: 2, resI: 5, resLevel: "Rất cao", actions: [{ desc: "Quét mã QR vòng đeo tay", owner: "ĐD. Huệ", deadline: "2026-10-30", status: "Đang xử lý" }],
                 status: "DA_DUYET", isKeyRisk: true, q1: "Đã thí điểm vòng đeo", q2: "Duy trì", q3: "", q4: "", notes: "[QLCL]: BGĐ phê duyệt."
@@ -772,9 +815,9 @@
 
             const bannerText = document.getElementById('roleInstructionText');
             const bannerTag = document.getElementById('roleScopeTag');
-            if (currentUser.role === 'HOD') { bannerText.innerText = `Cấp 1 - Trưởng Khoa / Chủ rủi ro (${currentUser.dept})`; bannerTag.innerText = `Chủ rủi ro: ${currentUser.dept}`; } 
-            else if (currentUser.role === 'COORDINATOR') { bannerText.innerText = `Cấp 2 - Phòng Quản Lý Chất Lượng`; bannerTag.innerText = `Phòng QLCL Toàn Viện`; } 
-            else { bannerText.innerText = `Cấp 3 - Ban Giám Đốc (Chủ tịch UBRR)`; bannerTag.innerText = `Ban Giám Đốc / UBRR`; }
+            if (currentUser.role === 'HOD') { bannerText.innerText = `Cấp 1 - Trưởng Khoa / Chủ rủi ro (${currentUser.dept}): Tầm nhìn dữ liệu giới hạn tại khoa.`; bannerTag.innerText = `Chủ rủi ro: ${currentUser.dept}`; } 
+            else if (currentUser.role === 'COORDINATOR') { bannerText.innerText = `Cấp 2 - Phòng Quản Lý Chất Lượng: Tầm nhìn dữ liệu Toàn Viện.`; bannerTag.innerText = `Phòng QLCL Toàn Viện`; } 
+            else { bannerText.innerText = `Cấp 3 - Ban Giám Đốc (Chủ tịch UBRR): Tầm nhìn dữ liệu Toàn Viện.`; bannerTag.innerText = `Ban Giám Đốc / UBRR`; }
 
             setupTabsAndActions();
             setupFilterOptions();
@@ -861,9 +904,12 @@
 
             filtered.forEach(r => {
                 const keyStar = r.isKeyRisk ? '<i class="fa-solid fa-star text-amber-500 ml-1"></i>' : '';
-                const scopeBadge = r.scope === 'Cấp Bệnh Viện' ? '<span class="bg-indigo-100 text-indigo-800 text-[10px] px-1.5 py-0.2 rounded font-bold border border-indigo-200">Cấp Viện</span>' : '<span class="bg-slate-100 text-slate-600 text-[10px] px-1.5 py-0.2 rounded border">Khoa</span>';
+                const scopeBadge = r.scope === 'Cấp Bệnh Viện' ? '<span class="bg-indigo-100 text-indigo-800 text-[10px] px-1.5 py-0.2 rounded font-bold border border-indigo-200 mr-1.5">Cấp Viện</span>' : '<span class="bg-slate-100 text-slate-600 text-[10px] px-1.5 py-0.2 rounded border mr-1.5">Khoa</span>';
                 const resLvlText = MATRIX_5X5[r.resL][r.resI];
                 
+                const coDeptsHtml = (r.scope === 'Cấp Bệnh Viện' && r.coDepts && r.coDepts.length > 0) ? `<div class="text-[10px] text-slate-500 mt-1">PH: ${r.coDepts.join(', ')}</div>` : '';
+                const causeHtml = r.cause ? `<div class="text-[10px] text-slate-500 mt-1 truncate max-w-[250px]" title="${r.cause}">NN: ${r.cause}</div>` : '';
+
                 let actSummary = '-';
                 if (r.actions && r.actions.length > 0) {
                     const firstAct = r.actions[0];
@@ -878,8 +924,8 @@
                 tr.className = "hover:bg-slate-50 border-b";
                 tr.innerHTML = `
                     <td class="p-3 text-center font-mono font-black text-teal-900">${r.id}${keyStar}<br><span class="text-[9px] text-slate-400 font-normal">Năm ${r.reportYear||'2026'}</span></td>
-                    <td class="p-3"><div class="flex items-center gap-1 mb-0.5">${scopeBadge}<span class="font-bold text-slate-800">${r.dept}</span></div></td>
-                    <td class="p-3"><p class="font-bold text-slate-800 text-xs">${r.desc}</p></td>
+                    <td class="p-3"><div class="flex items-center mb-0.5">${scopeBadge}<span class="font-bold text-slate-800">${r.dept}</span></div>${coDeptsHtml}</td>
+                    <td class="p-3"><p class="font-bold text-slate-800 text-xs">${r.desc}</p>${causeHtml}</td>
                     <td class="p-3 text-center">${getLevelBadgeHtml(resLvlText)}</td>
                     <td class="p-3">${actSummary}</td>
                     <td class="p-3 text-center">${getStatusBadgeHtml(r.status)}</td>
@@ -891,7 +937,7 @@
                 card.className = "bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2.5";
                 card.innerHTML = `
                     <div class="flex justify-between items-start"><div><span class="font-mono font-black text-teal-900 text-xs">${r.id}</span> ${keyStar}</div>${getLevelBadgeHtml(resLvlText)}</div>
-                    <div><h4 class="font-bold text-slate-800 text-xs">${r.desc}</h4></div>
+                    <div><h4 class="font-bold text-slate-800 text-xs mb-1">${r.desc}</h4>${causeHtml}</div>
                     <div class="flex justify-between items-center pt-1 border-t text-xs">${getStatusBadgeHtml(r.status)} <button onclick="openDetailModal('${r.id}')" class="text-teal-700 font-bold">Chi tiết ></button></div>
                 `;
                 cardBox.appendChild(card);
@@ -1002,7 +1048,6 @@
                 }
             });
 
-            // TÍNH TOÁN LẠI % KIỂM SOÁT HIỆU QUẢ (CHỈ ĐẾM TRÊN HỒ SƠ ĐÃ DUYỆT)
             let approvedData = data.filter(r => r.status === 'DA_DUYET');
             let effCount = approvedData.filter(r => r.ctrlEff === 'Hiệu quả').length;
             let effPercent = approvedData.length > 0 ? ((effCount / approvedData.length) * 100).toFixed(0) + '%' : '0%';
@@ -1029,7 +1074,22 @@
 
             const topRisksTbody = document.getElementById('topRisksTableBody');
             topRisksTbody.innerHTML = '';
-            let topRisks = data.filter(r => r.isKeyRisk && (MATRIX_5X5[r.resL][r.resI] === 'Rất cao' || MATRIX_5X5[r.resL][r.resI] === 'Cao'));
+            
+            let topRisks = data.filter(r => r.isKeyRisk || MATRIX_5X5[r.resL][r.resI] === 'Rất cao' || MATRIX_5X5[r.resL][r.resI] === 'Cao');
+            
+            topRisks.sort((a, b) => {
+                let levelA = MATRIX_5X5[a.resL][a.resI];
+                let levelB = MATRIX_5X5[b.resL][b.resI];
+                let valA = levelA === 'Rất cao' ? 3 : (levelA === 'Cao' ? 2 : 1);
+                let valB = levelB === 'Rất cao' ? 3 : (levelB === 'Cao' ? 2 : 1);
+                
+                if (valA !== valB) return valB - valA; 
+                
+                let hasOverdueA = (a.status === 'DA_DUYET' && a.actions && a.actions.some(act => getActionDynamicStatus(act, a.status) === 'Quá hạn')) ? 1 : 0;
+                let hasOverdueB = (b.status === 'DA_DUYET' && b.actions && b.actions.some(act => getActionDynamicStatus(act, b.status) === 'Quá hạn')) ? 1 : 0;
+                return hasOverdueB - hasOverdueA;
+            });
+
             if (topRisks.length === 0) topRisksTbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-400 italic">Không có rủi ro trọng điểm UBRR.</td></tr>`;
             else {
                 topRisks.forEach(r => {
@@ -1037,7 +1097,7 @@
                         <tr class="hover:bg-slate-50 border-b cursor-pointer" onclick="openDetailModal('${r.id}')">
                             <td class="p-2.5 font-bold text-teal-900">${r.id}</td>
                             <td class="p-2.5 font-bold">${r.dept}</td>
-                            <td class="p-2.5">${r.desc}</td>
+                            <td class="p-2.5"><div class="truncate max-w-[250px]">${r.desc}</div></td>
                             <td class="p-2.5 text-center">${getLevelBadgeHtml(MATRIX_5X5[r.resL][r.resI])}</td>
                             <td class="p-2.5 text-center">${getStatusBadgeHtml(r.status)}</td>
                         </tr>
@@ -1106,7 +1166,11 @@
             try {
                 const ctxTrend = document.getElementById('chartTrendCombo');
                 if (ctxTrend) {
-                    let qs = ['Q1', 'Q2', 'Q3', 'Q4'];
+                    let selectedYear = document.getElementById('dbFilterYear').value || '2026';
+                    let isCurrentYear = (selectedYear === '2026');
+                    let qs = isCurrentYear ? ['Q1', 'Q2', 'Q3'] : ['Q1', 'Q2', 'Q3', 'Q4'];
+                    let labelsWithYear = qs.map(q => `${q}/${selectedYear}`);
+
                     let totalByQ = qs.map(q => data.filter(r => r.reportQuarter === q).length);
                     let redByQ = qs.map(q => data.filter(r => r.reportQuarter === q && MATRIX_5X5[r.resL][r.resI] === 'Rất cao').length);
                     let orangeByQ = qs.map(q => data.filter(r => r.reportQuarter === q && MATRIX_5X5[r.resL][r.resI] === 'Cao').length);
@@ -1115,7 +1179,7 @@
                     chartTrendInstance = new Chart(ctxTrend.getContext('2d'), {
                         type: 'bar',
                         data: {
-                            labels: qs,
+                            labels: labelsWithYear,
                             datasets: [
                                 { type: 'line', label: 'Rủi ro Rất Cao (Đỏ)', data: redByQ, borderColor: '#ef4444', backgroundColor: '#ef4444', borderWidth: 2, tension: 0.3 },
                                 { type: 'line', label: 'Rủi ro Cao (Cam)', data: orangeByQ, borderColor: '#f97316', backgroundColor: '#f97316', borderWidth: 2, tension: 0.3 },
@@ -1133,7 +1197,6 @@
                     let allDeptsRadar = ['Khoa Khám Bệnh', 'Khoa Dược', 'Khoa Phẫu Thuật - Gây Mê'];
                     if (currentUser.role === 'HOD') allDeptsRadar = [currentUser.dept];
 
-                    // TÍNH TOÁN RADAR CŨNG CHỈ DỰA TRÊN HỒ SƠ ĐÃ DUYỆT
                     let effByDept = allDeptsRadar.map(d => {
                         let deptApproved = data.filter(r => r.dept === d && r.status === 'DA_DUYET');
                         let deptEff = deptApproved.filter(r => r.ctrlEff === 'Hiệu quả').length;
@@ -1210,7 +1273,7 @@
             let matchedItems = [];
 
             if (type === 'total') matchedItems = data;
-            else if (type === 'effective') matchedItems = data.filter(r => r.status === 'DA_DUYET' && r.ctrlEff === 'Hiệu quả'); // Bổ sung logic lọc cho click
+            else if (type === 'effective') matchedItems = data.filter(r => r.status === 'DA_DUYET' && r.ctrlEff === 'Hiệu quả');
             else if (type === 'red') matchedItems = data.filter(r => MATRIX_5X5[r.resL][r.resI] === 'Rất cao');
             else if (type === 'orange') matchedItems = data.filter(r => MATRIX_5X5[r.resL][r.resI] === 'Cao');
             else if (type === 'overdue') {
@@ -1238,7 +1301,6 @@
 
         function closeModal(modalId) { document.getElementById(modalId).classList.add('hidden'); }
 
-        // --- CẬP NHẬT CHI TIẾT POPUP ---
         function openDetailModal(id) {
             const r = riskItems.find(x => x.id === id);
             if (!r) return;
@@ -1251,6 +1313,15 @@
             document.getElementById('dtCat').innerText = r.category;
             document.getElementById('dtYearQuarter').innerText = (r.reportYear || '2026') + ' - ' + r.reportQuarter;
             document.getElementById('dtKeyTag').innerHTML = r.isKeyRisk ? '<span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold ml-1"><i class="fa-solid fa-star text-amber-500 mr-1"></i> Rủi Ro Chính UBRR</span>' : '';
+
+            // HIỂN THỊ ĐƠN VỊ PHỐI HỢP TRONG CHI TIẾT
+            const coDeptsBox = document.getElementById('dtCoDeptsBox');
+            if (r.scope === 'Cấp Bệnh Viện' && r.coDepts && r.coDepts.length > 0) {
+                coDeptsBox.classList.remove('hidden');
+                document.getElementById('dtCoDeptsText').innerText = r.coDepts.join(', ');
+            } else {
+                coDeptsBox.classList.add('hidden');
+            }
 
             document.getElementById('dtCause').innerText = r.cause || 'Không có dữ liệu';
             document.getElementById('dtImpact').innerText = r.impact || 'Không có dữ liệu';
@@ -1339,7 +1410,6 @@
             document.getElementById('modalDetail').classList.remove('hidden');
         }
 
-        // --- CẬP NHẬT QUÝ ---
         function openQuarterUpdateModal() {
             const r = riskItems.find(x => x.id === activeDetailRiskId);
             if (!r) return;
@@ -1485,19 +1555,13 @@
             row.id = rowId;
             row.className = "bg-white p-2.5 rounded-lg border border-teal-200 grid grid-cols-1 sm:grid-cols-12 gap-2 items-center";
             row.innerHTML = `
-                <div class="sm:col-span-4"><input type="text" name="actDesc" value="${desc.replace(/"/g, '&quot;')}" placeholder="Nội dung hành động..." required class="w-full border border-slate-300 rounded p-1.5 focus:outline-teal-600 text-xs"></div>
-                <div class="sm:col-span-3"><input type="text" name="actOwner" value="${owner.replace(/"/g, '&quot;')}" placeholder="Người phụ trách..." required class="w-full border border-slate-300 rounded p-1.5 focus:outline-teal-600 text-xs"></div>
-                <div class="sm:col-span-2"><input type="date" name="actDeadline" value="${deadline}" required class="w-full border border-slate-300 rounded p-1.5 focus:outline-teal-600 text-xs"></div>
-                <div class="sm:col-span-2"><select name="actStatus" class="w-full border border-slate-300 rounded p-1.5 text-xs focus:outline-teal-600"><option value="Chưa tới hạn">Chưa tới hạn</option><option value="Đang xử lý">Đang xử lý</option><option value="Đã hoàn thành">Đã hoàn thành</option></select></div>
-                <div class="sm:col-span-1 text-center"><button type="button" onclick="removeActionInputRow('${rowId}')" class="text-rose-500 hover:text-rose-700 p-1.5 bg-rose-50 hover:bg-rose-100 rounded" title="Xóa"><i class="fa-solid fa-trash-can"></i></button></div>
+                <div class="sm:col-span-4"><input type="text" name="actDesc" value="${desc.replace(/"/g, '&quot;')}" placeholder="Nội dung hành động..." required class="w-full border border-slate-300 rounded p-1.5 text-xs focus:border-teal-600 outline-none"></div>
+                <div class="sm:col-span-3"><input type="text" name="actOwner" value="${owner.replace(/"/g, '&quot;')}" placeholder="Người phụ trách..." required class="w-full border border-slate-300 rounded p-1.5 text-xs focus:border-teal-600 outline-none"></div>
+                <div class="sm:col-span-2"><input type="date" name="actDeadline" value="${deadline}" required class="w-full border border-slate-300 rounded p-1.5 text-xs focus:border-teal-600 outline-none"></div>
+                <div class="sm:col-span-2"><select name="actStatus" class="w-full border border-slate-300 rounded p-1.5 text-xs focus:border-teal-600 outline-none"><option value="Chưa tới hạn">Chưa tới hạn</option><option value="Đang xử lý">Đang xử lý</option><option value="Đã hoàn thành">Đã hoàn thành</option></select></div>
+                <div class="sm:col-span-1 text-center"><button type="button" onclick="this.closest('div.grid').remove()" class="text-rose-500 hover:text-rose-700 p-1.5 bg-rose-50 hover:bg-rose-100 rounded"><i class="fa-solid fa-trash-can"></i></button></div>
             `;
             container.appendChild(row);
-        }
-
-        function removeActionInputRow(rowId) {
-            const container = document.getElementById('actionInputsContainer');
-            if (container.children.length > 1) { document.getElementById(rowId).remove(); } 
-            else { alert("Phải có ít nhất 1 hành động!"); }
         }
 
         function toggleScopeInputs() {
@@ -1510,17 +1574,17 @@
             const initL = parseInt(document.getElementById('fInitL').value); const initI = parseInt(document.getElementById('fInitI').value);
             const initScore = MATRIX_5X5[initL][initI];
             document.getElementById('fInitBadge').innerText = initScore;
-            document.getElementById('fInitBadge').className = `px-3 py-1 rounded-lg font-bold border inline-block text-xs ${initScore === 'Rất cao' ? 'badge-extreme' : (initScore === 'Cao' ? 'badge-high' : (initScore === 'Trung bình' ? 'badge-medium' : 'badge-low'))}`;
+            document.getElementById('fInitBadge').className = `px-4 py-1.5 rounded-lg font-bold border text-sm ${initScore === 'Rất cao' ? 'badge-extreme' : (initScore === 'Cao' ? 'badge-high' : (initScore === 'Trung bình' ? 'badge-medium' : 'badge-low'))}`;
 
             const d = document.getElementById('fCtrlDesign').value; const c = document.getElementById('fCtrlCompliance').value;
             const eff = MATRIX_CONTROL[d][c];
             document.getElementById('fCtrlEffBadge').innerText = eff;
-            document.getElementById('fCtrlEffBadge').className = `px-2.5 py-1 rounded text-xs font-bold inline-block ${eff === 'Hiệu quả' ? 'eff-good' : (eff === 'Không hiệu quả' ? 'eff-bad' : 'eff-warn')}`;
+            document.getElementById('fCtrlEffBadge').className = `px-3 py-1.5 rounded-lg text-xs font-bold inline-block ${eff === 'Hiệu quả' ? 'eff-good' : (eff === 'Không hiệu quả' ? 'eff-bad' : 'eff-warn')}`;
 
             const resL = parseInt(document.getElementById('fResL').value); const resI = parseInt(document.getElementById('fResI').value);
             const resScore = MATRIX_5X5[resL][resI];
             document.getElementById('fResBadge').innerText = resScore;
-            document.getElementById('fResBadge').className = `px-3 py-1 rounded-lg font-bold border inline-block text-xs ${resScore === 'Rất cao' ? 'badge-extreme' : (resScore === 'Cao' ? 'badge-high' : (resScore === 'Trung bình' ? 'badge-medium' : 'badge-low'))}`;
+            document.getElementById('fResBadge').className = `px-4 py-1.5 rounded-lg font-bold border text-sm ${resScore === 'Rất cao' ? 'badge-extreme' : (resScore === 'Cao' ? 'badge-high' : (resScore === 'Trung bình' ? 'badge-medium' : 'badge-low'))}`;
         }
 
         function saveRiskRecord(status) {
@@ -1564,7 +1628,7 @@
             closeModal('modalForm'); renderAppList(); syncTabBadgeCount();
         }
 
-        // ================= KỊCH BẢN AUTO-TEST ĐÃ CẬP NHẬT =================
+        // ================= KỊCH BẢN AUTO-TEST =================
         function runAutomatedTests() {
             const logBox = document.getElementById('testLogContainer');
             logBox.innerHTML = '<p class="text-yellow-300">[Auto-Test] Đang xác thực bộ mã nguồn BI Dashboard Master...</p>';
@@ -1583,23 +1647,7 @@
             setTimeout(() => { if (typeof setHeatmapMode === 'function') { logTest("✓ TC07 (Ma trận chuyển dịch): Tích hợp thành công nút gạt Trước/Sau kiểm soát.", true); testsPassed++; } else { logTest("✗ TC07: Lỗi hàm gạt ma trận.", false); } }, 1400);
             setTimeout(() => { if (typeof drilldownMatrix === 'function') { logTest("✓ TC08 (Drill-down): Hỗ trợ click ô ma trận & thẻ Hotzone để truy xuất danh sách 1 chạm.", true); testsPassed++; } else { logTest("✗ TC08: Thiếu hàm lọc 1 chạm.", false); } }, 1600);
             setTimeout(() => { currentUser = USER_ACCOUNTS['tk_duoc']; renderDashboardAnalytics(); if (chartDeptGroupedInstance && chartDeptGroupedInstance.data.labels.length === 1 && chartDeptGroupedInstance.data.labels[0] === 'Khoa Dược') { logTest("✓ TC09 (Biểu đồ phân quyền HOD): Trưởng khoa Dược chỉ thấy biểu đồ khoa mình.", true); testsPassed++; } else { logTest("✗ TC09: Biểu đồ khoa hiển thị chưa đúng quyền.", false); } }, 1800);
-            
-            // CẬP NHẬT TC10: Bắt bộ đếm đi qua hàm lọc (applyDashboardFilters) giống y như chart đang làm
-            setTimeout(() => { 
-                currentUser = USER_ACCOUNTS['dpv_qlcl']; 
-                document.getElementById('dbFilterYear').value = "2026"; // Ép test chạy ở năm mặc định
-                renderDashboardAnalytics(); 
-                let baseData = riskItems.filter(r => isRiskVisibleToRole(r));
-                let testFilteredData = applyDashboardFilters(baseData); // Test học cách lọc dữ liệu giống Dashboard
-                let approvedOnly = testFilteredData.filter(r => r.status === 'DA_DUYET').length; 
-                let chartCount = chartDeptGroupedInstance ? chartDeptGroupedInstance.data.datasets[1].data.reduce((a,b)=>a+b, 0) : -1; 
-                if (approvedOnly === chartCount) { 
-                    logTest("✓ TC10 (Grouped Bar & Radar): Hệ thống vẽ biểu đồ phức hợp chạy tốt, không sập.", true); testsPassed++; 
-                } else { 
-                    logTest("✗ TC10: Lỗi render biểu đồ phức hợp. Đếm tay=" + approvedOnly + " vs Chart=" + chartCount, false); 
-                } 
-            }, 2000);
-            
+            setTimeout(() => { currentUser = USER_ACCOUNTS['dpv_qlcl']; document.getElementById('dbFilterYear').value = "2026"; renderDashboardAnalytics(); let baseData = riskItems.filter(r => isRiskVisibleToRole(r)); let testFilteredData = applyDashboardFilters(baseData); let approvedOnly = testFilteredData.filter(r => r.status === 'DA_DUYET').length; let chartCount = chartDeptGroupedInstance ? chartDeptGroupedInstance.data.datasets[1].data.reduce((a,b)=>a+b, 0) : -1; if (approvedOnly === chartCount) { logTest("✓ TC10 (Grouped Bar & Radar): Hệ thống vẽ biểu đồ phức hợp chạy tốt, không sập.", true); testsPassed++; } else { logTest("✗ TC10: Lỗi render biểu đồ phức hợp. Đếm tay=" + approvedOnly + " vs Chart=" + chartCount, false); } }, 2000);
             setTimeout(() => { if (document.getElementById('chartCategoryDoughnut')) { logTest("✓ TC11 (Chart IDs Mismatch Fix): Xác thực ID Biểu đồ Cơ cấu và Khoa/Phòng đã khớp hoàn toàn.", true); testsPassed++; } else { logTest("✗ TC11: Còn lỗi lệch ID biểu đồ Doughnut.", false); } }, 2200);
             setTimeout(() => { let actionLocked = riskItems.some(r => r.status !== 'DA_DUYET' && r.actions && getActionDynamicStatus(r.actions[0], r.status) === 'Chờ duyệt'); if (actionLocked) { logTest("✓ TC12 (Business Rule): Khóa đếm tiến độ & % Hiệu quả đối với hồ sơ CHƯA DUYỆT.", true); testsPassed++; } else { logTest("✗ TC12: Lỗi rò rỉ hành động chưa duyệt vào báo cáo.", false); } }, 2400);
             setTimeout(() => { let has2025 = riskItems.some(r => r.reportYear === '2025'); if (has2025) { logTest("✓ TC13 (Lọc Năm - Year Filter): Dữ liệu hỗ trợ bóc tách báo cáo xuyên năm (2025 vs 2026).", true); testsPassed++; } else { logTest("✗ TC13: Chưa hỗ trợ lọc đa năm.", false); } }, 2600);
